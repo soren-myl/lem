@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEM Fodbold — Venner på Udebane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--pitch:#1a3a1a;--grass:#2d6e2d;--lime:#c8f542;--chalk:#f5f0e8;--smoke:#e8e2d6;--ink:#1a1a1a;--mud:#6b5c3e;--red:#d4382a;--gold:#e8c84a;--panel:#f0ebe0;--border:#c8c0b0}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;background:var(--chalk);color:var(--ink);overflow-x:hidden}
+  header{background:var(--pitch);position:sticky;top:0;z-index:100;border-bottom:3px solid var(--lime)}
+  .header-inner{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{display:flex;align-items:center;gap:.75rem;text-decoration:none;cursor:pointer}
+  .logo-badge{width:40px;height:40px;background:var(--lime);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--pitch);letter-spacing:.05em;flex-shrink:0}
+  .logo-text{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--chalk);letter-spacing:.1em;line-height:1}
+  .logo-sub{font-size:.6rem;color:var(--lime);letter-spacing:.2em;text-transform:uppercase;line-height:1}
+  nav{display:flex;gap:.25rem}
+  nav a{color:rgba(245,240,232,.7);text-decoration:none;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .75rem;border-radius:3px;transition:all .2s;font-weight:500}
+  nav a:hover,nav a.active{color:var(--lime);background:rgba(200,245,66,.08)}
+  .add-btn{background:var(--lime);color:var(--pitch);border:none;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:.5rem 1rem;border-radius:3px;cursor:pointer;transition:all .2s}
+  .add-btn:hover{background:#d9f55a;transform:translateY(-1px)}
+  .hero{background:var(--pitch);padding:5rem 2rem 4rem;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(200,245,66,.04) 59px,rgba(200,245,66,.04) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(200,245,66,.04) 59px,rgba(200,245,66,.04) 60px);pointer-events:none}
+  .hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+  .hero-tag{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--lime);margin-bottom:1rem;font-weight:500}
+  .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,8vw,6rem);color:var(--chalk);line-height:.9;letter-spacing:.03em;margin-bottom:1.5rem}
+  .hero h1 span{color:var(--lime)}
+  .hero-desc{color:rgba(245,240,232,.7);line-height:1.7;font-size:1rem;max-width:380px;margin-bottom:2rem}
+  .hero-stats{display:flex;gap:2rem}
+  .stat-num{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--lime);line-height:1}
+  .stat-label{font-size:.7rem;color:rgba(245,240,232,.5);letter-spacing:.15em;text-transform:uppercase}
+  .hero-visual{position:relative;height:280px;display:flex;align-items:center;justify-content:center}
+  .globe-ring{width:240px;height:240px;border:1px solid rgba(200,245,66,.2);border-radius:50%;position:absolute;animation:spin 40s linear infinite}
+  .globe-ring:nth-child(2){width:180px;height:180px;border-color:rgba(200,245,66,.12);animation-duration:25s;animation-direction:reverse}
+  .globe-ring:nth-child(3){width:300px;height:300px;border-color:rgba(200,245,66,.06);animation-duration:60s}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .globe-center{width:80px;height:80px;background:var(--lime);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;z-index:1;box-shadow:0 0 60px rgba(200,245,66,.3)}
+  .city-dot{position:absolute;width:8px;height:8px;background:var(--lime);border-radius:50%;box-shadow:0 0 8px rgba(200,245,66,.6)}
+  .city-dot::after{content:attr(data-city);position:absolute;left:12px;top:-3px;white-space:nowrap;font-size:.6rem;color:rgba(245,240,232,.6);letter-spacing:.1em;text-transform:uppercase}
+  .search-section{background:var(--panel);border-bottom:1px solid var(--border);padding:1.5rem 2rem;position:sticky;top:64px;z-index:90}
+  .search-inner{max-width:1200px;margin:0 auto;display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+  .search-wrap{flex:1;min-width:220px;position:relative}
+  .search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.4;pointer-events:none}
+  .search-input{width:100%;padding:.65rem 1rem .65rem 2.5rem;background:white;border:1.5px solid var(--border);border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--ink);outline:none;transition:border-color .2s}
+  .search-input:focus{border-color:var(--grass)}
+  .filter-select{padding:.65rem 1rem;background:white;border:1.5px solid var(--border);border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--ink);cursor:pointer;outline:none;min-width:140px}
+  .sort-pills{display:flex;gap:.5rem}
+  .pill{padding:.5rem .85rem;border:1.5px solid var(--border);border-radius:20px;background:transparent;font-family:'DM Sans',sans-serif;font-size:.75rem;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .2s;color:var(--ink);font-weight:500}
+  .pill.active,.pill:hover{background:var(--pitch);border-color:var(--pitch);color:var(--lime)}
+  .results-count{font-size:.8rem;color:var(--mud);white-space:nowrap;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-left:auto}
+  main{max-width:1200px;margin:0 auto;padding:3rem 2rem}
+  .section-header{display:flex;align-items:baseline;gap:1rem;margin-bottom:2rem}
+  .section-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.05em;color:var(--pitch)}
+  .section-line{flex:1;height:1px;background:var(--border)}
+  .trips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem}
+  .trip-card{background:white;border:1.5px solid var(--border);border-radius:6px;overflow:hidden;transition:all .25s;cursor:pointer;position:relative}
+  .trip-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(26,58,26,.12);border-color:var(--grass)}
+  .card-header{background:var(--pitch);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
+  .card-header::after{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;border:1px solid rgba(200,245,66,.1)}
+  .card-league{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--lime);font-weight:500}
+  .card-date{font-size:.75rem;color:rgba(245,240,232,.5);letter-spacing:.05em}
+  .card-body{padding:1.25rem}
+  .card-teams{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+  .team-name{font-family:'DM Serif Display',serif;font-size:1.05rem;color:var(--ink);flex:1;line-height:1.2}
+  .score-badge{background:var(--pitch);color:var(--lime);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.1em;padding:.25rem .6rem;border-radius:3px;min-width:56px;text-align:center;flex-shrink:0}
+  .card-meta{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem}
+  .meta-tag{display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--mud);background:var(--panel);padding:.25rem .6rem;border-radius:3px}
+  .card-note{font-size:.82rem;color:#555;line-height:1.6;font-style:italic;border-left:2px solid var(--lime);padding-left:.75rem;margin-bottom:1rem}
+  .card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--smoke)}
+  .rating-display{display:flex;align-items:center;gap:.5rem}
+  .rating-stars{display:flex;gap:2px}
+  .star{width:13px;height:13px;color:var(--gold)}
+  .star.empty{color:var(--border)}
+  .rating-num{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--pitch);line-height:1}
+  .rating-label{font-size:.62rem;color:var(--mud);letter-spacing:.1em;text-transform:uppercase}
+  .card-city{font-size:.78rem;color:var(--mud);font-weight:500}
+  /* corner triangle removed */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(26,58,26,.75);z-index:200;backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:2rem}
+  .overlay.open{display:flex}
+  .modal,.detail-modal{background:var(--chalk);border-radius:8px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.3)}
+  .modal{max-width:640px}
+  .detail-modal{max-width:680px}
+  .modal-hdr{background:var(--pitch);padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;border-radius:8px 8px 0 0}
+  .modal-ttl{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--chalk);letter-spacing:.05em}
+  .modal-x{width:32px;height:32px;background:rgba(245,240,232,.1);border:none;border-radius:50%;color:var(--chalk);cursor:pointer;font-size:1.1rem;transition:background .2s}
+  .modal-x:hover{background:rgba(245,240,232,.2)}
+  .modal-body{padding:2rem}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+  .fg{margin-bottom:1rem}
+  .fg label{display:block;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mud);font-weight:500;margin-bottom:.4rem}
+  .fi,.fta,.fsel{width:100%;padding:.65rem .85rem;background:white;border:1.5px solid var(--border);border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--ink);outline:none;transition:border-color .2s}
+  .fi:focus,.fta:focus,.fsel:focus{border-color:var(--grass)}
+  .fta{resize:vertical;min-height:80px}
+  .star-input{display:flex;gap:6px}
+  .sbtn{width:32px;height:32px;background:none;border:1.5px solid var(--border);border-radius:4px;cursor:pointer;font-size:1rem;transition:all .15s;display:flex;align-items:center;justify-content:center}
+  .sbtn.on{background:var(--gold);border-color:var(--gold)}
+  .fsub{width:100%;padding:.9rem;background:var(--pitch);color:var(--lime);border:none;border-radius:4px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.1em;cursor:pointer;transition:all .2s;margin-top:.5rem}
+  .fsub:hover{background:var(--grass)}
+  .detail-top{background:var(--pitch);padding:2rem;border-radius:8px 8px 0 0;position:relative;overflow:hidden}
+  .detail-top::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 29px,rgba(200,245,66,.03) 29px,rgba(200,245,66,.03) 30px)}
+  .d-league{font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--lime);margin-bottom:.75rem;font-weight:500}
+  .d-teams{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+  .d-team{flex:1;font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--chalk);line-height:1.1}
+  .d-team.away{text-align:right}
+  .d-score{background:var(--lime);color:var(--pitch);font-family:'Bebas Neue',sans-serif;font-size:2.3rem;padding:.25rem .9rem;border-radius:4px;letter-spacing:.1em;flex-shrink:0}
+  .d-meta{display:flex;gap:1.5rem;flex-wrap:wrap}
+  .d-meta span{font-size:.78rem;color:rgba(245,240,232,.6)}
+  .d-body{padding:2rem}
+  .d-sec{margin-bottom:1.5rem}
+  .d-sec h3{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.15em;color:var(--pitch);margin-bottom:.5rem;text-transform:uppercase}
+  .d-note{font-size:.93rem;line-height:1.75;color:#444}
+  .ls-big{display:flex;align-items:center;gap:1rem}
+  .ls-circle{width:72px;height:72px;background:var(--pitch);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0}
+  .ls-num{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--lime);line-height:1}
+  .ls-max{font-size:.6rem;color:rgba(245,240,232,.4);letter-spacing:.1em}
+  .ls-verdict{font-family:'DM Serif Display',serif;font-size:1.2rem;font-style:italic;color:var(--pitch)}
+  .stars-big{display:flex;gap:4px;margin-top:4px}
+  .timeline{position:relative;padding-left:2rem}
+  .timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--lime),transparent)}
+  .tl-year{position:relative;margin-bottom:2rem}
+  .tl-year-lbl{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--pitch);letter-spacing:.05em;margin-bottom:1rem;position:relative}
+  .tl-year-lbl::before{content:'';position:absolute;left:-2.5rem;top:50%;transform:translateY(-50%);width:12px;height:12px;background:var(--lime);border-radius:50%;box-shadow:0 0 0 3px rgba(200,245,66,.2)}
+  .tl-items{display:flex;flex-direction:column;gap:.75rem}
+  .tl-item{display:flex;align-items:center;gap:1rem;padding:.75rem 1rem;background:white;border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:all .2s}
+  .tl-item:hover{border-color:var(--grass);background:var(--panel)}
+  .ti-d{font-size:.72rem;color:var(--mud);min-width:70px;letter-spacing:.05em}
+  .ti-m{flex:1;font-size:.88rem;font-weight:500}
+  .ti-s{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--pitch);background:var(--panel);padding:.2rem .5rem;border-radius:3px}
+  .ti-r{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--lime);background:var(--pitch);padding:.2rem .5rem;border-radius:3px;min-width:44px;text-align:center}
+  .stats-strip{background:var(--pitch);padding:3rem 2rem;margin:4rem 0 0}
+  .stats-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:2rem}
+  .strip-stat{text-align:center}
+  .strip-num{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--lime);line-height:1;margin-bottom:.25rem}
+  .strip-lbl{font-size:.68rem;color:rgba(245,240,232,.5);letter-spacing:.18em;text-transform:uppercase;font-weight:500}
+  footer{background:var(--ink);padding:2rem}
+  .foot-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+  .foot-logo{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--lime);letter-spacing:.1em}
+  .foot-txt{font-size:.78rem;color:rgba(245,240,232,.35)}
+  .empty-state{display:none;text-align:center;padding:4rem 2rem;grid-column:1/-1}
+  .empty-state.show{display:block}
+  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--pitch);color:var(--lime);padding:1rem 1.5rem;border-radius:4px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;transform:translateY(120px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);z-index:300;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+  .toast.show{transform:translateY(0)}
+  @media(max-width:768px){.hero-inner{grid-template-columns:1fr}.hero-visual{display:none}nav{display:none}.stats-inner{grid-template-columns:repeat(3,1fr)}.frow{grid-template-columns:1fr}.foot-inner{flex-direction:column;gap:.5rem}.sort-pills{display:none}}
+  @media(max-width:480px){.trips-grid{grid-template-columns:1fr}.stats-inner{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo" onclick="showSection('grid');setNav(document.querySelector('nav a'))">
+      <div class="logo-badge">LEM</div>
+      <div><div class="logo-text">Fodbold</div><div class="logo-sub">Venner på Udebane</div></div>
+    </div>
+    <nav>
+      <a href="#" class="active" onclick="showSection('grid');setNav(this);return false">Ture</a>
+      <a href="#" onclick="showSection('timeline');setNav(this);return false">Tidslinje</a>
+      <a href="#" onclick="showSection('stats');setNav(this);return false">Stats</a>
+    </nav>
+    <button class="add-btn" onclick="openAddProtected()">+ Tilføj tur</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <p class="hero-tag">⚽ Fodbold- og Kirkerejser siden 2008</p>
+      <h1>LEM<br><span>Fodbold</span><br>Historien</h1>
+      <p class="hero-desc">Fra jomfruturen til Barcelona i 2008 til EM-slutrundekampe i Stuttgart 2024. Venner på udebane med den officielle LemScore™.</p>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num" id="hTrips">—</div><div class="stat-label">Kampe</div></div>
+        <div class="stat"><div class="stat-num" id="hCities">—</div><div class="stat-label">Byer</div></div>
+        <div class="stat"><div class="stat-num" id="hAvg">—</div><div class="stat-label">Snit LemScore</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="globe-ring"></div><div class="globe-ring"></div><div class="globe-ring"></div>
+      <div class="globe-center">⚽</div>
+      <div class="city-dot" data-city="London" style="top:22%;left:24%"></div>
+      <div class="city-dot" data-city="Milano" style="top:44%;left:53%"></div>
+      <div class="city-dot" data-city="Madrid" style="top:63%;left:20%"></div>
+      <div class="city-dot" data-city="Lissabon" style="top:67%;left:12%"></div>
+      <div class="city-dot" data-city="Stuttgart" style="top:30%;left:50%"></div>
+      <div class="city-dot" data-city="Athen" style="top:60%;left:62%"></div>
+    </div>
+  </div>
+</section>
+
+<div class="search-section">
+  <div class="search-inner">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Søg hold, by, land, liga…" oninput="filterTrips()">
+    </div>
+    <select class="filter-select" id="filterLeague" onchange="filterTrips()"><option value="">Alle turneringer</option></select>
+    <select class="filter-select" id="filterCountry" onchange="filterTrips()"><option value="">Alle lande</option></select>
+    <select class="filter-select" id="filterSport" onchange="filterTrips()"><option value="">Alle sportsgrene</option></select>
+    <div class="sort-pills">
+      <button class="pill active" onclick="sortBy('newest',this)">Nyeste</button>
+      <button class="pill" onclick="sortBy('oldest',this)">Ældste</button>
+      <button class="pill" onclick="sortBy('best',this)">Bedste</button>
+    </div>
+    <div class="results-count" id="resCount"></div>
+  </div>
+</div>
+
+<main>
+  <div id="secGrid">
+    <div class="section-header"><h2 class="section-title">Alle Ture</h2><div class="section-line"></div></div>
+    <div class="trips-grid" id="grid">
+      <div class="empty-state" id="emptyState"><div style="font-size:3rem;margin-bottom:1rem">🔍</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--mud);letter-spacing:.05em">Ingen ture matcher</div></div>
+    </div>
+  </div>
+  <div id="secTimeline" style="display:none">
+    <div class="section-header"><h2 class="section-title">Tidslinje</h2><div class="section-line"></div></div>
+    <div class="timeline" id="tlContent"></div>
+  </div>
+  <div id="secStats" style="display:none">
+    <div class="section-header"><h2 class="section-title">Statistik</h2><div class="section-line"></div></div>
+    <div id="statsContent"></div>
+  </div>
+</main>
+
+<div class="stats-strip">
+  <div class="stats-inner">
+    <div class="strip-stat"><div class="strip-num" id="sTotal">0</div><div class="strip-lbl">Kampe set</div></div>
+    <div class="strip-stat"><div class="strip-num" id="sCities">0</div><div class="strip-lbl">Byer besøgt</div></div>
+    <div class="strip-stat"><div class="strip-num" id="sLeagues">0</div><div class="strip-lbl">Turneringer</div></div>
+    <div class="strip-stat"><div class="strip-num" id="sAvg">0.0</div><div class="strip-lbl">Snit LemScore™</div></div>
+    <div class="strip-stat"><div class="strip-num" id="sYears">0</div><div class="strip-lbl">År på vejene</div></div>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <div class="foot-logo">LEM Fodbold</div>
+    <div class="foot-txt">Officiel LemScore™ siden 2008 · @lemfodbold</div>
+    <div style="font-size:.72rem;color:rgba(245,240,232,.25);letter-spacing:.1em;text-transform:uppercase">Lem Fodbold- og Kirkerejser</div>
+  </div>
+</footer>
+
+<!-- ADD MODAL -->
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-ttl">Tilføj Ny Tur</span><button class="modal-x" onclick="closeAdd()">✕</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Hjemmehold *</label><input class="fi" id="fHome" placeholder="f.eks. Arsenal"></div>
+        <div class="fg"><label>Udehold *</label><input class="fi" id="fAway" placeholder="f.eks. Chelsea"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Resultat</label><input class="fi" id="fScore" placeholder="f.eks. 2-1"></div>
+        <div class="fg"><label>Dato *</label><input type="date" class="fi" id="fDate"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>By *</label><input class="fi" id="fCity" placeholder="f.eks. London"></div>
+        <div class="fg"><label>Land</label><input class="fi" id="fCountry" placeholder="f.eks. England"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Liga / Turnering *</label><input class="fi" id="fLeague" placeholder="f.eks. Premier League"></div>
+        <div class="fg"><label>Stadion</label><input class="fi" id="fStadium" placeholder="f.eks. Emirates Stadium"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Sport</label>
+          <select class="fsel" id="fSport"></select>
+        </div>
+        <div class="fg"><label>Ny sportskategori (valgfrit)</label><input class="fi" id="fCustomSport" placeholder="f.eks. Hundevæddeløb"></div>
+      </div>
+      <div class="fg"><label>LemScore™ (1.0–10.0)</label><input type="number" class="fi" id="fLem" min="1" max="10" step="0.1" placeholder="Lad stå tom hvis ikke bedømt endnu"></div>
+      <div class="fg"><label>Kommentar / oplevelse</label><textarea class="fta" id="fNote" placeholder="Beskriv kampen, stemningen, forplejning, X-faktor…"></textarea></div>
+      <div class="fg"><label>Stjerne-rating (1–5)</label>
+        <div class="star-input">
+          <button class="sbtn" data-v="1" onclick="setStar(1)">★</button>
+          <button class="sbtn" data-v="2" onclick="setStar(2)">★</button>
+          <button class="sbtn" data-v="3" onclick="setStar(3)">★</button>
+          <button class="sbtn" data-v="4" onclick="setStar(4)">★</button>
+          <button class="sbtn" data-v="5" onclick="setStar(5)">★</button>
+        </div>
+      </div>
+      <button class="fsub" onclick="saveTrip()">💾 GEM TUR</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="detailOverlay">
+  <div class="detail-modal" id="detailContent"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// REAL DATA — udtrukket fra @lemfodbold på X/Twitter
+// LemScore™ er ud af 10. starRating (1-5) baseret på score/kommentar.
+// ═══════════════════════════════════════════════════════════
+const SEED = [
+  {id:1,home:"FC Barcelona",away:"RCD Espanyol",score:"0-0",date:"2008-01-01",city:"Barcelona",country:"Spanien",stadium:"Camp Nou",league:"La Liga",sport:"Fodbold",lem:null,star:2,note:"Klubbens allerførste kamp — jomfruturen til Barcelona 2008. Skuffende 0-0. 12 gule kort. Historisk Lem-tur #1. #lemhistory"},
+  {id:2,home:"Hamburger SV",away:"Borussia Dortmund",score:"2-1",date:"2008-09-01",city:"Hamburg",country:"Tyskland",stadium:"Volksparkstadion",league:"Bundesliga",sport:"Fodbold",lem:null,star:4,note:"Tur #2 — 2008: HSV-Dortmund 2-1. Zidan på banen. #lemhistory #2 #Hamburg"},
+  {id:3,home:"Liverpool",away:"Everton",score:"1-0",date:"2010-04-03",city:"Liverpool",country:"England",stadium:"Anfield",league:"Premier League",sport:"Fodbold",lem:null,star:4,note:"2010: Liverpool-Everton 1-0, rede kort. #lemhistory #3 #liverpool. En af de bedste tidlige ture."},
+  {id:4,home:"St Helens",away:"Hull FC",score:"12-32",date:"2013-02-23",city:"St Helens",country:"England",stadium:"Totally Wicked Stadium",league:"Super League Rugby",sport:"Rugby",lem:null,star:3,note:"Bonus-kamp: UKs to bedste rugby league-hold, St Helens-Hull 12-32. Hårde drenge, meget tægt. #lemhistory #3"},
+  {id:5,home:"Fulham",away:"Stoke City",score:"1-0",date:"2013-02-23",city:"London",country:"England",stadium:"Craven Cottage",league:"Premier League",sport:"Fodbold",lem:null,star:3,note:"23feb13: Fulham-Stoke 1-0 (Berbatov) og direkte i en cab mod QPR. #lemhistory #6 #fulham #stoke"},
+  {id:6,home:"QPR",away:"Manchester United",score:"0-2",date:"2013-02-23",city:"London",country:"England",stadium:"Loftus Road",league:"Premier League",sport:"Fodbold",lem:null,star:3,note:"QPR mødte Man Utd — Lüning Sr blandt venner på QPR-afsnittet — så klare 0-2. #lemhistory #6 #qpr #manutd"},
+  {id:7,home:"Swansea City",away:"Bradford City",score:"5-0",date:"2013-02-24",city:"London",country:"England",stadium:"Wembley Stadium",league:"League Cup Finale",sport:"Fodbold",lem:null,star:4,note:"Bonus-finale med Mister som træner: Swansea-Bradford på Wembley og chrushing 5-0. #lemhistory #7"},
+  {id:8,home:"Club Brugge",away:"Standard Liège",score:"2-2",date:"2010-10-17",city:"Brugge",country:"Belgien",stadium:"Jan Breydel Stadion",league:"Pro League Belgien",sport:"Fodbold",lem:null,star:3,note:"Club Brugge-St. Liège 2-2. Gang i den, spænding og røde kort. Bruxelles som base for kamp i både Holland og Belgien. #lemhistory #4"},
+  {id:9,home:"PSV Eindhoven",away:"FC Twente",score:"0-1",date:"2010-10-16",city:"Eindhoven",country:"Holland",stadium:"Philips Stadion",league:"Eredivisie",sport:"Fodbold",lem:null,star:2,note:"PSV-Twente 0-1 efter at PSV i forrige hjemmekamp vandt 10-0 over Feyenoord. Skuffende. #lemhistory #4 #psv #twente"},
+  {id:10,home:"Bochum",away:"Köln",score:"1-0",date:"2017-03-31",city:"Bochum",country:"Tyskland",stadium:"Vonovia Ruhrstadion",league:"2. Bundesliga",sport:"Fodbold",lem:null,star:3,note:"En af de stereomæssige højdepunkter i Lem-historien: Bochum-Köln 1-0. #lemhistory #7 #bochum"},
+  {id:11,home:"Schalke 04",away:"Werder Bremen",score:"3-1",date:"2017-03-31",city:"Gelsenkirchen",country:"Tyskland",stadium:"Veltins-Arena",league:"Bundesliga",sport:"Fodbold",lem:null,star:4,note:"De svenske billetter fik fingeren da vi så 3-1 kampen Schalke04-Werder Bremen. Allerede samme år gik turen til det biledskønne Gelsenkirchen. #lemhistory #7 #schalke04 #werder"},
+  {id:12,home:"Málaga CF",away:"Atlético Madrid",score:"0-2",date:"2017-04-01",city:"Málaga",country:"Spanien",stadium:"La Rosaleda",league:"La Liga",sport:"Fodbold",lem:5.5,star:3,note:"Málaga-Atletico Madrid 0-2. Ingen stor kamp, men kynisk og kalkuleret kørt hjem af Atletico. LemScore™ 5,5. #lemhistory #8"},
+  {id:13,home:"Wolfsburg",away:"Freiburg",score:"3-0",date:"2017-04-01",city:"Wolfsburg",country:"Tyskland",stadium:"Volkswagen Arena",league:"Bundesliga",sport:"Fodbold",lem:null,star:3,note:"Wolfsburg-Freiburg og Bendtner fra 80' minut 3-0. #lemhistory #8"},
+  {id:14,home:"Borussia Dortmund",away:"Köln",score:"0-0",date:"2017-04-01",city:"Dortmund",country:"Tyskland",stadium:"Signal Iduna Park",league:"Bundesliga",sport:"Fodbold",lem:null,star:3,note:"Borussia Dortmund-Köln 0-0. #lemhistory #8"},
+  {id:15,home:"Bayer Leverkusen",away:"Stuttgart",score:"4-0",date:"2017-04-01",city:"Leverkusen",country:"Tyskland",stadium:"BayArena",league:"Bundesliga",sport:"Fodbold",lem:null,star:4,note:"Bayer Leverkusen-Stuttgart 4-0. #lemhistory #8"},
+  {id:16,home:"Real Madrid",away:"Atlético Madrid",score:"4-1",date:"2016-04-21",city:"Madrid",country:"Spanien",stadium:"Santiago Bernabéu",league:"La Liga",sport:"Fodbold",lem:null,star:5,note:"Real vs. Atletico 4-1! Madrid-derby på Bernabéu. #lemhistory #5 #madrid #realmadrid"},
+  {id:17,home:"Alcalá CF",away:"Coruxo FC",score:"1-1",date:"2016-04-20",city:"Alcalá de Henares",country:"Spanien",stadium:"Municipal de Alcalá",league:"Segunda B",sport:"Fodbold",lem:null,star:2,note:"Segunda B: Alcalá vs. Coruxo 1-1. #lemhistory #5"},
+  {id:18,home:"Inter Movistar",away:"Magna Gurpea",score:"4-0",date:"2016-04-22",city:"Madrid",country:"Spanien",stadium:"Palacio de los Deportes",league:"Liga Nacional Futsal",sport:"Futsal",lem:null,star:4,note:"Fredagsunderholdning i Madrid: Inter Movistar - Magna Gurpea 4-0. #lemhistory #5 #futsal #intermovistar #madrid"},
+  {id:19,home:"Inter Milan",away:"Torino",score:"1-2",date:"2016-04-03",city:"Milano",country:"Italien",stadium:"San Siro",league:"Serie A",sport:"Fodbold",lem:null,star:3,note:"Inter-Torino 1-2. Uuuudemærket placering i blade sæder til sidsta kamp. Dagens andet Milanese nederlag og hele to røde kort til Inter. Slutresultat 1-2. #sansiro #InterTorino"},
+  {id:20,home:"Atalanta",away:"AC Milan",score:"2-1",date:"2016-04-03",city:"Bergamo",country:"Italien",stadium:"Gewiss Stadium",league:"Serie A",sport:"Fodbold",lem:null,star:4,note:"Atalanta-AC Milan 2-1. Fuldt fortjent og med saksespark til 1-1. 25 EUR billetter skaffet. Atalanta — træt stadion — fin baggrund. #AtalantaMilan"},
+  {id:21,home:"Pro Vercelli",away:"Modena",score:"?-?",date:"2016-04-02",city:"Vercelli",country:"Italien",stadium:"Stadio Silvio Piola",league:"Serie B",sport:"Fodbold",lem:null,star:2,note:"Serie B: Vercelli-Modena. Nyt kunstgræs og masser af gamle mænd."},
+  {id:22,home:"Juventus",away:"Empoli",score:"1-0",date:"2016-04-02",city:"Turin",country:"Italien",stadium:"Allianz Stadium",league:"Serie A",sport:"Fodbold",lem:null,star:4,note:"Juventus-Empoli. DET er et topklassestadion. Buffon (Gigi) fejres for sin clean sheet rekord. Et solo gol, ma tanto basta. Og mucho nice pladser. Prisen på højde med en mellemstørrelse Fiat."},
+  {id:23,home:"Estoril",away:"Benfica",score:"1-2",date:"2018-04-21",city:"Estoril",country:"Portugal",stadium:"Estádio António Coimbra da Mota",league:"Primeira Liga",sport:"Fodbold",lem:10.0,star:5,note:"Optimal oplevelse. Forventelig overtag og 1-0 føring til Benfica efter første halvdel. Vendt på hovedet i 2. med friskt Estoril-spil, VAR-annulleret mål, udligning og drama med Benfica 2-1 scoring i de 7 mins overtid. Officiel LemScore™ helt uhørt 10,0 — topkarakter fra alle. Suverænt mindste stadion, vi har besøgt til en første-ligakamp. Bund mod top!"},
+  {id:24,home:"Sporting CP",away:"Boavista",score:"1-0",date:"2018-04-22",city:"Lissabon",country:"Portugal",stadium:"Estádio José Alvalade",league:"Primeira Liga",sport:"Fodbold",lem:4.8,star:3,note:"Sporting-Boavista 1-0. På et VAR straffe. Suk. Flot stadion, rimelig gang i publikum. Halvtrist fodbold — specielt 2. halvleg uden nerve. Samlet officiel LemScore™ 4,8."},
+  {id:25,home:"CD Cova-Wazim",away:"ukendt",score:"1-1",date:"2018-04-22",city:"Lissabon",country:"Portugal",stadium:"Clube Desportivo Cova da Piedade",league:"Segunda Liga Portugal",sport:"Fodbold",lem:5.6,star:3,note:"CD Cova-Wazim 1-1. Ikke ophidsende men med lettere drama og to straffesparksmål på det intime stadion. LemScore™ 5,6. Stadionkapacitet 3.500. Billetpris med fri seating: 6€. Tur #11 og 10 års jubilæum siden jomfruturen til Barcelona i 2008."},
+  {id:26,home:"Sevilla FC",away:"Sporting Gijón",score:"0-0",date:"2017-04-02",city:"Sevilla",country:"Spanien",stadium:"Estadio Ramón Sánchez-Pizjuán",league:"La Liga",sport:"Fodbold",lem:6.5,star:4,note:"Officiel LemScore™ 6,5 for Sevilla-Gijon. Go stemning og spænding i kampen. Udueige indersideafslutninger og tidsudstrack. Vel ankommet i Sevilla og klubben har straks fundet et passende sted som støtter om sloganet 'hvede, hvede, hvede'."},
+  {id:27,home:"Granada CF",away:"FC Barcelona",score:"1-4",date:"2017-04-02",city:"Granada",country:"Spanien",stadium:"Estadio Nuevo Los Cármenes",league:"La Liga",sport:"Fodbold",lem:8.16,star:5,note:"Officiel LemScore™ 8,16 for jubilæumsturens sidste kamp. Barca var FOR suveræne til at give topkarakter. Granada gav lidt kamp i 2. men suveræn opvisning af Barca 1-4. Dejlig aftenstemning til Grenada-Barcelona. Verdens 3. største katedral også tjekket af på listen. Vellykket jubilæumstur #10."},
+  {id:28,home:"OGC Nice",away:"Girondins de Bordeaux",score:"1-1",date:"2019-11-08",city:"Nice",country:"Frankrig",stadium:"Allianz Riviera",league:"Ligue 1",sport:"Fodbold",lem:4.0,star:2,note:"Noget sløj 1-1 Nice-Bordeaux med svag Dolberg i 90 minutter. Fint stadium, under halvfyldt men dog med lidt liv i tilskuerne. Samlet officiel LemScore™ på 4,0. Hårde 45 mins i megetmeget lille elevator på 2½ sal…"},
+  {id:29,home:"AS Monaco",away:"Dijon FCO",score:"1-0",date:"2019-11-09",city:"Monaco",country:"Monaco",stadium:"Stade Louis II",league:"Ligue 1",sport:"Fodbold",lem:3.4,star:2,note:"Monaco-Dijon er vel ubetinget det tommeste stadion med fladeste stemning vi i Lem-historien har besøgt. Masser af chancer — alligevel kun til 1-0 hjemmesejr. Men vi sad på lækre, røde plussæder og skønt med central beliggenhed. LemScore™ på 3,4."},
+  {id:30,home:"Atromitos",away:"Aris FC",score:"0-0",date:"2022-11-05",city:"Athen",country:"Grækenland",stadium:"Peristeri Stadium",league:"Super League Grækenland",sport:"Fodbold",lem:7.1,star:4,note:"Atromitos-Aris 0-0, midteropgør i den græske superliga. Sløjt fodbold, dog med 2 røde kort til trænerne, 2 VAR-situationer og annulleret mål. Køb af 6€ billetter af Ultras og generelt autentisk 👍 Officiel LemScore™ på 7,1."},
+  {id:31,home:"Olympiakos BC",away:"Valencia Basket",score:"82-83",date:"2022-11-04",city:"Athen",country:"Grækenland",stadium:"Peace and Friendship Stadium",league:"EuroLeague Basketball",sport:"Basketball",lem:7.3,star:4,note:"Olympiakos-Valencia 82-83… majet spændende afslutning, eneste tidspunkt udeholdet var foran. Fremragende stemning 👍 — hemmelige øl til salg af chip/cola-sælgerne 👍. Det blir en stor 7,3 som Officiel LemScore™"},
+  {id:32,home:"Újpesti TE",away:"(modstander)",score:"9-4",date:"2024-04-28",city:"Budapest",country:"Ungarn",stadium:"UTE Sportközpont",league:"Futsal NB I Ungarn",sport:"Futsal",lem:4.6,star:2,note:"Weekendens fodbold blev et futsal nedrykningsdrama i udkants-Budapest. De lokale Ujpest fik hentet en vigtig 9-4 sejr i en dog flad atmosfære. Skuffende stille publikum trækker oplevelsen ned. LemScore™ på 4,6. Billetter kun 285 kr. i alt for 5 stk."},
+  {id:33,home:"Danmark",away:"Slovenien",score:"1-1",date:"2024-06-16",city:"Stuttgart",country:"Tyskland",stadium:"MHPArena Stuttgart",league:"UEFA EM 2024 — Gruppe C",sport:"Fodbold",lem:9,star:5,note:"EM-slutrundekamp! Stadion: 8/10 fedt, næsten lukket, super høj lyd, god størrelse. Forplejning: 5/10. Kø og sløjt tysk udvalg. X-faktor: 11. Det smil Louie gav mig da han trådte ind på stadion er guld værd. Elliot og Majken havde en mega fest midt i danskerlejeren. Samlet Officiel LemScore™: 9"},
+  {id:34,home:"Belgien",away:"Frankrig",score:"2-3",date:"2021-10-07",city:"Turin",country:"Italien",stadium:"Juventus Stadium",league:"UEFA Nations League SF",sport:"Fodbold",lem:9.1,star:5,note:"Officiel LemScore™ er helt oppe og ringe på 9,1 — den andenhøjeste i klubbens historie. Vi kommer næppe til igen at se SÅ mange dyre ben på samme bane: Mbappe, Griezmann, Benzema, de Bruyne, Lukaku og Hazard. Et forryggende Belgien i første halvleg og 2-0 men FRA i kæmpe comeback og med Mbappe som kampens spiller 3-2 til FRA."},
+  {id:35,home:"—",away:"—",score:"—",date:"2020-10-25",city:"Tysk bustur",country:"Tyskland",stadium:"Lem-bussen",league:"Lem Corona-tur 2020",sport:"Andet",lem:null,star:3,note:"Flot afvikling af 2020-Corona-udgave af Lem Rejser uden rigtig fodboldkamp. Knivskarp turnering med tæt afgørelse: Lars L. flot vinder, TSO på andenpladsen blot 2 point efter og Ribe i imponerende comeback på en samlet 3. plads. Og tak til Leif for knivskarp kørsel!"},
+];
+
+// Always start from SEED data (embedded in file).
+// Locally added/edited trips are stored in localStorage and merged on top.
+// This means the file works for everyone who opens it, even fresh.
+const LOCAL_KEY = 'lemfodb3_local';
+function loadTrips() {
+  const local = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+  // Merge: SEED is base, local additions override/extend by id
+  const seedIds = new Set(SEED.map(t=>t.id));
+  const localNew = local.filter(t=>!seedIds.has(t.id));    // brand-new trips added locally
+  const localEdits = {};
+  local.filter(t=>seedIds.has(t.id)).forEach(t=>localEdits[t.id]=t); // edits to seed trips
+  const merged = SEED.map(t=>localEdits[t.id]||t).concat(localNew);
+  return merged;
+}
+let trips = loadTrips();
+let curStar = 0, curSort = 'newest';
+function save(){
+  // Only save the delta: new trips + modified seed trips
+  const seedIds = new Set(SEED.map(t=>t.id));
+  const localNew = trips.filter(t=>!seedIds.has(t.id));
+  const modified = trips.filter(t=>seedIds.has(t.id) && JSON.stringify(t)!==JSON.stringify(SEED.find(s=>s.id===t.id)));
+  localStorage.setItem(LOCAL_KEY, JSON.stringify([...localNew,...modified]));
+}
+
+// ── PIN PROTECTION ──────────────────────────────────────────
+const ADMIN_PIN = '1978'; // ← SKIFT DENNE PIN!
+let isAdmin = false;
+function checkAdmin(action) {
+  if (isAdmin) { action(); return; }
+  const pin = prompt('🔒 Indtast PIN for at ' + action.name.replace(/^bound /,''));
+  if (pin === ADMIN_PIN) { isAdmin = true; setTimeout(()=>{ isAdmin=false; }, 30*60*1000); action(); }
+  else if (pin !== null) { toast('❌ Forkert PIN'); }
+}
+// Wrap admin actions
+function openAddProtected() { checkAdmin(openAdd); }
+function delTripProtected(id) { checkAdmin(()=>delTrip(id)); }
+
+// ── SPORT CATEGORIES (user-extensible) ───────────────────────
+const DEFAULT_SPORTS = ['Fodbold','Basketball','Futsal','Rugby','Hundevæddeløb','Håndbold','Tennis','Ishockey','Andet'];
+function getSports() { return JSON.parse(localStorage.getItem('lemSports')||'null') || DEFAULT_SPORTS; }
+function saveSports(arr) { localStorage.setItem('lemSports',JSON.stringify(arr)); }
+function addSportCategory(name) {
+  const s = getSports();
+  if (!s.includes(name)) { s.splice(s.length-1,0,name); saveSports(s); }
+}
+function populateSportSelects() {
+  const sports = getSports();
+  ['fSport','filterSport'].forEach(id=>{
+    const el=document.getElementById(id); if(!el)return;
+    const cur=el.value;
+    const isFilter=(id==='filterSport');
+    el.innerHTML=(isFilter?'<option value="">Alle sportsgrene</option>':'')+sports.map(s=>`<option value="${s}">${SI(s)} ${s}</option>`).join('');
+    if(cur)el.value=cur;
+  });
+}
+
+const SPORT_ICONS = {Fodbold:'⚽',Basketball:'🏀',Futsal:'🥅',Rugby:'🏉',Hundevæddeløb:'🐕',Håndbold:'🤾',Tennis:'🎾',Ishockey:'🏒'};
+const SI = s=>SPORT_ICONS[s]||'🎯';
+const fmt = d=>{if(!d||d==='—')return'';const x=new Date(d);return x.toLocaleDateString('da-DK',{day:'numeric',month:'short',year:'numeric'})};
+const lemLbl = s=>{if(!s)return'';if(s>=9)return'🏆 Legendarisk';if(s>=8)return'⭐ Fremragende';if(s>=6)return'👍 God';if(s>=4)return'😐 Middel';return'👎 Skuffende';};
+const starLbl = r=>(['','Skuffende','Middel','God','Fremragende','Legendarisk'])[Math.round(r)]||'';
+
+// 10-star rendering (LemScore scale)
+function stars(r, max=10) {
+  // r is 1-10 lemscore OR 1-5 fallback. Normalise to 10.
+  const filled = Math.round(r);
+  const total = max;
+  let h = '<div style="display:flex;gap:1px;flex-wrap:wrap;max-width:140px">';
+  for(let i=1;i<=total;i++) h+=`<svg style="width:11px;height:11px;color:${i<=filled?'var(--gold)':'var(--border)'}" viewBox="0 0 24 24" fill="${i<=filled?'currentColor':'none'}" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+  h += '</div>';
+  return h;
+}
+function stars5(r) { // 5-star for pre-lemscore
+  let h='<div style="display:flex;gap:2px">';
+  for(let i=1;i<=5;i++) h+=`<svg style="width:13px;height:13px;color:${i<=r?'var(--gold)':'var(--border)'}" viewBox="0 0 24 24" fill="${i<=r?'currentColor':'none'}" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+  h+='</div>';return h;
+}
+
+function filtered(){
+  const q=(document.getElementById('searchInput').value||'').toLowerCase();
+  const lf=document.getElementById('filterLeague').value;
+  const cf=document.getElementById('filterCountry').value;
+  const sf=document.getElementById('filterSport').value;
+  let r=trips.filter(t=>{
+    const mq=!q||[t.home,t.away,t.city,t.league,t.country,t.stadium,t.note,t.sport].some(v=>(v||'').toLowerCase().includes(q));
+    return mq&&(!lf||t.league===lf)&&(!cf||t.country===cf)&&(!sf||t.sport===sf);
+  });
+  if(curSort==='newest')r.sort((a,b)=>b.date.localeCompare(a.date));
+  else if(curSort==='oldest')r.sort((a,b)=>a.date.localeCompare(b.date));
+  else r.sort((a,b)=>(b.lem||b.star*2)-(a.lem||a.star*2));
+  return r;
+}
+
+function renderGrid(){
+  const list=filtered();
+  const g=document.getElementById('grid');
+  g.querySelectorAll('.trip-card').forEach(c=>c.remove());
+  document.getElementById('emptyState').classList.toggle('show',list.length===0);
+  document.getElementById('resCount').textContent=`${list.length} tur${list.length!==1?'e':''}`;
+  list.forEach(t=>{
+    const card=document.createElement('div');
+    card.className='trip-card';
+    card.onclick=()=>openDetail(t.id);
+    const noMatch=t.home==='—';
+    const mediaHtml = (t.media&&t.media.length) ? `<div style="display:flex;gap:4px;margin-bottom:.75rem;overflow-x:auto">${t.media.map(m=>m.type==='video'?`<video src="${m.url}" style="height:80px;border-radius:3px;flex-shrink:0" controls></video>`:`<img src="${m.url}" style="height:80px;border-radius:3px;object-fit:cover;flex-shrink:0" onclick="event.stopPropagation();openDetail(${t.id})">`).join('')}</div>` : '';
+    card.innerHTML=`
+      <div class="card-header">
+        <div class="card-league">${SI(t.sport)} ${t.league}</div>
+        <div class="card-date">${fmt(t.date)}</div>
+      </div>
+      <div class="card-body">
+        ${!noMatch?`<div class="card-teams">
+          <div class="team-name">${t.home}</div>
+          <div class="score-badge">${t.score||'–'}</div>
+          <div class="team-name" style="text-align:right">${t.away}</div>
+        </div>`:`<div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--mud);margin-bottom:.75rem;letter-spacing:.05em">${t.league}</div>`}
+        <div class="card-meta">
+          <span class="meta-tag">📍 ${t.city}, ${t.country}</span>
+          ${t.stadium&&t.stadium!=='Lem-bussen'?`<span class="meta-tag">🏟️ ${t.stadium}</span>`:''}
+        </div>
+        ${mediaHtml}
+        ${t.note?`<div class="card-note">${t.note.length>130?t.note.slice(0,127)+'…':t.note}</div>`:''}
+        <div class="card-footer">
+          <div class="rating-display">
+            ${t.lem
+              ? `<div>${stars(t.lem,10)}</div><div><div class="rating-num">${t.lem}<span style="font-size:.7rem;opacity:.6">/10</span></div><div class="rating-label">LemScore™ · ${lemLbl(t.lem)}</div></div>`
+              : `<div>${stars5(t.star)}</div><div><div style="font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mud);background:var(--smoke);padding:.2rem .5rem;border-radius:3px;font-weight:500">Præ-LemScore</div></div>`
+            }
+          </div>
+          <div class="card-city">🌍 ${t.country}</div>
+        </div>
+      </div>`;
+    g.appendChild(card);
+  });
+}
+
+function renderTimeline(){
+  const sorted=[...trips].sort((a,b)=>b.date.localeCompare(a.date));
+  const byY={};
+  sorted.forEach(t=>{const y=t.date.slice(0,4);if(!byY[y])byY[y]=[];byY[y].push(t);});
+  const tl=document.getElementById('tlContent');tl.innerHTML='';
+  Object.keys(byY).sort((a,b)=>b-a).forEach(year=>{
+    const sec=document.createElement('div');sec.className='tl-year';
+    sec.innerHTML=`<div class="tl-year-lbl">${year}</div><div class="tl-items" id="tl${year}"></div>`;
+    tl.appendChild(sec);
+    byY[year].forEach(t=>{
+      const it=document.createElement('div');it.className='tl-item';it.onclick=()=>openDetail(t.id);
+      it.innerHTML=`<span class="ti-d">${fmt(t.date)}</span><span style="font-size:.9rem">${SI(t.sport)}</span><span class="ti-m">${t.home==='—'?t.league:t.home+' vs '+t.away}</span><span class="ti-s">${t.score||'–'}</span><span style="font-size:.72rem;color:var(--mud);min-width:80px;text-align:center">${t.city}</span><span class="ti-r">${t.lem?t.lem+'★':t.star+'⭐'}</span>`;
+      document.getElementById(`tl${year}`).appendChild(it);
+    });
+  });
+}
+
+function renderStats(){
+  const sc=document.getElementById('statsContent');
+  const countries=[...new Set(trips.map(t=>t.country))].sort();
+  const withLem=trips.filter(t=>t.lem);
+  const top5=[...withLem].sort((a,b)=>b.lem-a.lem).slice(0,5);
+  const avgLS=withLem.length?(withLem.reduce((s,t)=>s+t.lem,0)/withLem.length).toFixed(1):'—';
+  sc.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem">
+      <div style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:1.5rem">
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.15em;color:var(--pitch);margin-bottom:1rem;text-transform:uppercase">🏆 Top LemScore™ Kampe</h3>
+        ${top5.map((t,i)=>`<div onclick="openDetail(${t.id})" style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--smoke);cursor:pointer" onmouseover="this.style.color='var(--grass)'" onmouseout="this.style.color=''">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--border);min-width:24px">${i+1}</span>
+          <div style="flex:1"><div style="font-weight:500;font-size:.9rem">${t.home} vs ${t.away}</div><div style="font-size:.75rem;color:var(--mud)">${t.city} · ${fmt(t.date)}</div></div>
+          <div style="text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--pitch)">${t.lem}</div><div style="font-size:.6rem;color:var(--mud);letter-spacing:.1em">LEMSCORE</div></div>
+        </div>`).join('')}
+      </div>
+      <div style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:1.5rem">
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.15em;color:var(--pitch);margin-bottom:1rem;text-transform:uppercase">Lande Besøgt (${countries.length})</h3>
+        ${countries.map(c=>{const n=trips.filter(t=>t.country===c).length;const pct=Math.round(n/trips.length*100);return`<div style="margin-bottom:.7rem"><div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.3rem"><span style="font-weight:500">${c}</span><span style="color:var(--mud)">${n} tur${n!==1?'e':''}</span></div><div style="height:6px;background:var(--smoke);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--grass);border-radius:3px"></div></div></div>`;}).join('')}
+      </div>
+    </div>
+    <div style="background:white;border:1.5px solid var(--border);border-radius:6px;padding:1.5rem">
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.15em;color:var(--pitch);margin-bottom:.75rem;text-transform:uppercase">Om LemScore™ systemet</h3>
+      <p style="font-size:.9rem;color:#555;line-height:1.75">LemScore™ er gruppens officielle karaktersystem for kampoplevelser — en samlet score fra 1–10 baseret på stadion, stemning, kampkvalitet og X-faktorer. Gennemsnit for alle scorede kampe: <strong>${avgLS}/10</strong>. Den højeste nogensinde: <strong>${top5[0]?top5[0].lem+'/10 ('+top5[0].home+' vs '+top5[0].away+')':'—'}</strong>. Den laveste: <strong>${[...withLem].sort((a,b)=>a.lem-b.lem)[0]?.lem}/10 (${[...withLem].sort((a,b)=>a.lem-b.lem)[0]?.home} vs ${[...withLem].sort((a,b)=>a.lem-b.lem)[0]?.away})</strong>.</p>
+    </div>`;
+}
+
+function openDetail(id){
+  const t=trips.find(x=>x.id===id);if(!t)return;
+  const d=document.getElementById('detailContent');
+  const noMatch=t.home==='—';
+  const mediaGallery = (t.media&&t.media.length) ? `
+    <div class="d-sec">
+      <h3>📸 Billeder & Video</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.5rem">
+        ${t.media.map((m,i)=>m.type==='video'
+          ?`<video src="${m.url}" controls style="width:100%;border-radius:4px;aspect-ratio:16/9;object-fit:cover"></video>`
+          :`<div style="position:relative"><img src="${m.url}" style="width:100%;height:110px;object-fit:cover;border-radius:4px;cursor:zoom-in" onclick="window.open('${m.url}','_blank')"><button onclick="removeMedia(${t.id},${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:white;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:.7rem;display:${isAdmin?'flex':'none'};align-items:center;justify-content:center">×</button></div>`
+        ).join('')}
+      </div>
+    </div>` : '';
+  const uploadSection = `
+    <div class="d-sec" id="mediaUploadSec" style="display:${isAdmin?'block':'none'}">
+      <h3>📎 Tilføj billeder/video</h3>
+      <input type="file" id="mediaFile" accept="image/*,video/*" multiple style="display:none" onchange="handleMediaUpload(${t.id},this)">
+      <button onclick="document.getElementById('mediaFile').click()" style="padding:.5rem 1rem;background:var(--panel);border:1.5px solid var(--border);border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;color:var(--ink)">📁 Vælg filer fra computer</button>
+      <p style="font-size:.72rem;color:var(--mud);margin-top:.4rem">Billeder og video gemmes i din browser (localStorage). Eksportér siden for permanent opbevaring.</p>
+    </div>`;
+  d.innerHTML=`
+    <div class="detail-top">
+      <div class="d-league">${SI(t.sport)} ${t.league}</div>
+      ${!noMatch?`<div class="d-teams"><div class="d-team">${t.home}</div><div class="d-score">${t.score||'–'}</div><div class="d-team away">${t.away}</div></div>`:`<div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--chalk);margin-bottom:1rem">${t.league}</div>`}
+      <div class="d-meta">
+        <span>📅 ${fmt(t.date)}</span>
+        <span>📍 ${t.city}, ${t.country}</span>
+        ${t.stadium&&t.stadium!=='Lem-bussen'?`<span>🏟️ ${t.stadium}</span>`:''}
+      </div>
+    </div>
+    <div class="d-body">
+      ${t.note?`<div class="d-sec"><h3>Oplevelse & kommentar</h3><p class="d-note">${t.note}</p></div>`:''}
+      ${mediaGallery}
+      ${uploadSection}
+      <div class="d-sec">
+        <h3>Officiel LemScore™ & Rating</h3>
+        <div class="ls-big">
+          ${t.lem
+            ?`<div class="ls-circle"><div class="ls-num">${t.lem}</div><div class="ls-max">/10</div></div>
+               <div><div class="ls-verdict">${lemLbl(t.lem)}</div>${stars(t.lem,10)}</div>`
+            :`<div style="background:var(--smoke);border-radius:4px;padding:.5rem 1rem;font-size:.8rem;color:var(--mud);letter-spacing:.08em;text-transform:uppercase;font-weight:500">Præ-LemScore æra</div>`
+          }
+        </div>
+        ${!t.lem&&t.star?`<div style="margin-top:.75rem">${stars5(t.star)}<div style="font-size:.8rem;color:var(--mud);margin-top:.25rem">${starLbl(t.star)}</div></div>`:''}
+      </div>
+      <div style="display:flex;gap:.75rem;margin-top:1rem">
+        <button onclick="delTripProtected(${t.id})" style="flex:1;padding:.65rem;background:none;border:1.5px solid #ddd;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:#999;transition:all .2s" onmouseover="this.style.borderColor='#c00';this.style.color='#c00'" onmouseout="this.style.borderColor='#ddd';this.style.color='#999'" ${isAdmin?'':'title="Kræver admin PIN"'}>🗑️ Slet</button>
+        <button onclick="closeDetail()" style="flex:1;padding:.65rem;background:var(--pitch);border:none;border-radius:4px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;cursor:pointer;color:var(--lime)">LUK</button>
+      </div>
+    </div>`;
+  document.getElementById('detailOverlay').classList.add('open');
+}
+function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');}
+function delTrip(id){if(!confirm('Slet tur?'))return;trips=trips.filter(t=>t.id!==id);save();closeDetail();renderAll();toast('Tur slettet');}
+
+function handleMediaUpload(tripId, input) {
+  const trip = trips.find(t=>t.id===tripId);
+  if (!trip) return;
+  if (!trip.media) trip.media = [];
+  const files = Array.from(input.files);
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      trip.media.push({ type: file.type.startsWith('video') ? 'video' : 'image', url: e.target.result, name: file.name });
+      loaded++;
+      if (loaded === files.length) { save(); openDetail(tripId); toast(`📸 ${files.length} fil${files.length>1?'er':''} tilføjet!`); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function removeMedia(tripId, idx) {
+  const trip = trips.find(t=>t.id===tripId);
+  if (!trip||!trip.media) return;
+  trip.media.splice(idx,1);
+  save(); openDetail(tripId); toast('Billede fjernet');
+}
+
+function openAdd(){document.getElementById('addOverlay').classList.add('open');setStar(0);populateSportSelects();}
+function closeAdd(){document.getElementById('addOverlay').classList.remove('open');}
+function setStar(v){curStar=v;document.querySelectorAll('.sbtn').forEach(b=>b.classList.toggle('on',+b.dataset.v<=v));}
+function saveTrip(){
+  const h=document.getElementById('fHome').value.trim(),aw=document.getElementById('fAway').value.trim(),
+        dt=document.getElementById('fDate').value,cy=document.getElementById('fCity').value.trim(),
+        lg=document.getElementById('fLeague').value.trim();
+  if(!h||!aw||!dt||!cy||!lg){toast('Udfyld påkrævede felter *');return;}
+  // Add custom sport if needed
+  const customSport = document.getElementById('fCustomSport').value.trim();
+  const sport = customSport || document.getElementById('fSport').value;
+  if (customSport) addSportCategory(customSport);
+  trips.unshift({id:Date.now(),home:h,away:aw,score:document.getElementById('fScore').value.trim()||'?-?',date:dt,city:cy,country:document.getElementById('fCountry').value.trim(),stadium:document.getElementById('fStadium').value.trim(),league:lg,sport,lem:parseFloat(document.getElementById('fLem').value)||null,star:curStar||3,note:document.getElementById('fNote').value.trim(),media:[]});
+  save();closeAdd();
+  ['fHome','fAway','fScore','fDate','fCity','fCountry','fStadium','fLeague','fNote','fLem','fCustomSport'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  setStar(0);renderAll();toast('🎉 Tur tilføjet!');
+}
+
+function filterTrips(){renderGrid();}
+function sortBy(m,el){curSort=m;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');renderGrid();}
+function showSection(s){
+  document.getElementById('secGrid').style.display=s==='grid'?'':'none';
+  document.getElementById('secTimeline').style.display=s==='timeline'?'':'none';
+  document.getElementById('secStats').style.display=s==='stats'?'':'none';
+  if(s==='timeline')renderTimeline();
+  if(s==='stats')renderStats();
+}
+function setNav(el){document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));if(el)el.classList.add('active');}
+
+function updateStats(){
+  const cities=new Set(trips.map(t=>t.city)).size;
+  const leagues=new Set(trips.map(t=>t.league)).size;
+  const wl=trips.filter(t=>t.lem);
+  const avg=wl.length?(wl.reduce((s,t)=>s+t.lem,0)/wl.length).toFixed(1):'—';
+  const years=trips.length?new Date().getFullYear()-Math.min(...trips.map(t=>+t.date.slice(0,4)))+1:0;
+  document.getElementById('sTotal').textContent=trips.length;
+  document.getElementById('sCities').textContent=cities;
+  document.getElementById('sLeagues').textContent=leagues;
+  document.getElementById('sAvg').textContent=avg;
+  document.getElementById('sYears').textContent=years;
+  document.getElementById('hTrips').textContent=trips.length;
+  document.getElementById('hCities').textContent=cities;
+  document.getElementById('hAvg').textContent=avg;
+  const ls=document.getElementById('filterLeague');const lc=ls.value;
+  ls.innerHTML='<option value="">Alle turneringer</option>';
+  [...new Set(trips.map(t=>t.league))].sort().forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l;if(l===lc)o.selected=true;ls.appendChild(o);});
+  const cs=document.getElementById('filterCountry');const cc=cs.value;
+  cs.innerHTML='<option value="">Alle lande</option>';
+  [...new Set(trips.map(t=>t.country))].sort().forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===cc)o.selected=true;cs.appendChild(o);});
+  populateSportSelects();
+}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+document.getElementById('addOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAdd();});
+document.getElementById('detailOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeDetail();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdd();closeDetail();}});
+
+function renderAll(){updateStats();renderGrid();}
+renderAll();
+</script>
+</body>
+</html>
