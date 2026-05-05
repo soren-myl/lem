@@ -752,7 +752,9 @@ function renderGrid(){
     card.className='card';card.onclick=()=>openDetail(t.id);
     const noMatch=t.home==='—';
     const media=t.media||[];
-    const strip=media.length?`<div class="card-media-strip">${media.slice(0,3).map(m=>`<img src="${m.url}" loading="lazy">`).join('')}${media.length>3?`<div class="card-media-more">+${media.length-3}</div>`:''}</div>`:'';
+    const strip=media.length?`<div class="card-media-strip">${media.slice(0,3).map(m=>m.type==='video'
+      ?`<video src="${m.url}#t=0.5" style="height:64px;width:80px;object-fit:cover;flex-shrink:0;border-radius:2px" preload="metadata" muted playsinline></video>`
+      :`<img src="${m.url}" loading="lazy">`).join('')}${media.length>3?`<div class="card-media-more">+${media.length-3}</div>`:''}</div>`:'';
     card.innerHTML=`
       <div class="card-hdr">
         <div class="card-league">${SI(t.sport)} ${t.league}</div>
