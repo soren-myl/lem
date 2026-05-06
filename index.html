@@ -543,7 +543,7 @@ footer{background:var(--ink);padding:1.5rem}
 // ═══════════════════════════════════════════════════════════════
 // APPS SCRIPT URL — indsæt din Web App URL her efter deploy
 // ═══════════════════════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/library/d/1i5pg0LhCfKxAJMMgz3-j2Ocv3f02cY97FcApNBbsG2i3RgJa5wcSOfsr/1';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJh1N8FIut4pjU8C9BwrANJPeGYiMj-ZCYzUMIMUV-KDsv0jojvQHSRUZf6Ciz9VZi/exec';
 
 // ═══════════════════════════════════════════════════════════════
 // SEED DATA — importeres én gang til Sheets, bruges derefter ikke
@@ -612,14 +612,34 @@ async function api(params) {
 async function loadTripsFromSheet() {
   try {
     const res = await api({ method: 'GET', sheet: 'trips' });
-    if (res.ok && res.data.length > 0) return res.data;
-    // Sheet is empty — seed it
+    if (res.ok && res.data.length >= 30) {
+      // Sheet has enough data — use it
+      return res.data;
+    }
+    // Sheet is empty or incomplete — clear and reseed
+    toast('⏳ Importerer data til Sheets…');
+    await api({ action: 'clearSheet', sheet: 'trips' });
+    await api({ action: 'clearSheet', sheet: 'wall' });
     await seedSheet();
-    return SEED_FOR_IMPORT;
+    toast('✅ Data importeret!');
+    // Reload from sheet
+    const res2 = await api({ method: 'GET', sheet: 'trips' });
+    return res2.ok ? res2.data : SEED_FOR_IMPORT;
   } catch(e) {
     console.warn('Sheets unavailable, using local seed:', e);
     return SEED_FOR_IMPORT;
   }
+}
+
+async function forceReseed() {
+  if (!confirm('Dette sletter alle ture i Sheets og genimporterer de originale 36 ture. Fortsæt?')) return;
+  toast('⏳ Rydder og genimporterer…');
+  await api({ action: 'clearSheet', sheet: 'trips' });
+  await api({ action: 'clearSheet', sheet: 'wall' });
+  await seedSheet();
+  trips = await api({ method: 'GET', sheet: 'trips' }).then(r => r.data);
+  renderAll();
+  toast('✅ Genimport færdig!');
 }
 
 async function seedSheet() {
