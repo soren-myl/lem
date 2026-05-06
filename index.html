@@ -543,7 +543,7 @@ footer{background:var(--ink);padding:1.5rem}
 // ═══════════════════════════════════════════════════════════════
 // APPS SCRIPT URL — indsæt din Web App URL her efter deploy
 // ═══════════════════════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJh1N8FIut4pjU8C9BwrANJPeGYiMj-ZCYzUMIMUV-KDsv0jojvQHSRUZf6Ciz9VZi/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/library/d/1i5pg0LhCfKxAJMMgz3-j2Ocv3f02cY97FcApNBbsG2i3RgJa5wcSOfsr/1';
 
 // ═══════════════════════════════════════════════════════════════
 // SEED DATA — importeres én gang til Sheets, bruges derefter ikke
@@ -623,13 +623,9 @@ async function loadTripsFromSheet() {
 }
 
 async function seedSheet() {
-  // Import all SEED trips into Sheets on first load
-  for (const t of SEED_FOR_IMPORT) {
-    await api({ action: 'add', sheet: 'trips', row: t });
-  }
-  for (const w of WALL_SEED) {
-    await api({ action: 'add', sheet: 'wall', row: w });
-  }
+  // Import ALL trips in ONE call — no timeout risk
+  await api({ action: 'bulkAdd', sheet: 'trips', rows: SEED_FOR_IMPORT });
+  await api({ action: 'bulkAdd', sheet: 'wall',  rows: WALL_SEED });
 }
 
 // ═══════════════════════════════════════════════════════════════
