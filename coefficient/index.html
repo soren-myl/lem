@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coefficient Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f2ea;
+    --surface:#fffdf8;
+    --surface-2:#eee9dc;
+    --ink:#17231c;
+    --muted:#5c6b60;
+    --muted-2:#7c8a7e;
+    --line:#dfd9c8;
+    --accent:#a9701f;
+    --accent-ink:#5c3c10;
+    --fav:#2f6b4f;
+    --fav-bg:#e4efe7;
+    --level:#3f5f7a;
+    --level-bg:#e5edf3;
+    --dog:#a23e2f;
+    --dog-bg:#f3e5e1;
+    --ucl:#8a6a1f;
+    --uel:#a5551f;
+    --uecl:#2f6b74;
+    --shadow: 0 1px 2px rgba(23,35,28,0.06), 0 6px 20px -8px rgba(23,35,28,0.18);
+    --track:#e4ded0;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1410;
+      --surface:#171d17;
+      --surface-2:#1e2620;
+      --ink:#eef1ea;
+      --muted:#a7b3ab;
+      --muted-2:#8a988e;
+      --line:#2b3329;
+      --accent:#d79c3f;
+      --accent-ink:#f4d9a3;
+      --fav:#5aab80;
+      --fav-bg:#1c2f24;
+      --level:#7fa6c8;
+      --level-bg:#1c2732;
+      --dog:#d97b64;
+      --dog-bg:#332019;
+      --ucl:#d1ab5c;
+      --uel:#d98a5a;
+      --uecl:#5aa3ac;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -8px rgba(0,0,0,0.5);
+      --track:#26302a;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1410;
+    --surface:#171d17;
+    --surface-2:#1e2620;
+    --ink:#eef1ea;
+    --muted:#a7b3ab;
+    --muted-2:#8a988e;
+    --line:#2b3329;
+    --accent:#d79c3f;
+    --accent-ink:#f4d9a3;
+    --fav:#5aab80;
+    --fav-bg:#1c2f24;
+    --level:#7fa6c8;
+    --level-bg:#1c2732;
+    --dog:#d97b64;
+    --dog-bg:#332019;
+    --ucl:#d1ab5c;
+    --uel:#d98a5a;
+    --uecl:#5aa3ac;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -8px rgba(0,0,0,0.5);
+    --track:#26302a;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Public Sans", ui-sans-serif, system-ui, sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  .wrap{max-width:1080px; margin:0 auto; padding:2.5rem 1.5rem 5rem;}
+
+  h1,h2,h3{font-family:"Oswald", ui-sans-serif, system-ui, sans-serif; text-transform:uppercase; letter-spacing:0.01em; text-wrap:balance; margin:0;}
+
+  .eyebrow{
+    font-family:"JetBrains Mono", ui-monospace, monospace;
+    font-size:0.72rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    display:flex; align-items:center; gap:0.6em;
+  }
+  .eyebrow::before{content:""; width:1.6em; height:2px; background:var(--accent); display:inline-block;}
+
+  header.hero{padding-bottom:1.8rem; border-bottom:1px solid var(--line); margin-bottom:2rem;}
+  header.hero h1{font-size:clamp(1.9rem,4vw,2.7rem); font-weight:600; margin-top:0.5rem; line-height:1.05;}
+  header.hero p.lede{max-width:62ch; color:var(--muted); font-size:1.05rem; margin-top:0.9rem;}
+  .hero-meta{display:flex; flex-wrap:wrap; gap:1.6rem; margin-top:1.4rem; font-size:0.86rem; color:var(--muted-2);}
+  .hero-meta strong{color:var(--ink); font-weight:600;}
+
+  .callouts{display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; margin-bottom:2.6rem;}
+  @media (max-width:900px){.callouts{grid-template-columns:1fr 1fr;}}
+  @media (max-width:600px){.callouts{grid-template-columns:1fr;}}
+  .callout{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:1.25rem 1.4rem; box-shadow:var(--shadow);
+    border-left:3px solid var(--fav);
+  }
+  .callout.watch{border-left-color:var(--dog);}
+  .callout.settled{border-left-color:var(--level);}
+  .callout.correction{border-left-color:var(--accent);}
+  .callout .tag{
+    font-family:"JetBrains Mono", monospace; font-size:0.68rem; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--fav); font-weight:600;
+  }
+  .callout.watch .tag{color:var(--dog);}
+  .callout.settled .tag{color:var(--level);}
+  .callout.correction .tag{color:var(--accent);}
+  .callout h3{font-size:1.05rem; margin-top:0.4rem; text-transform:none; font-weight:600; letter-spacing:0;}
+  .callout p{color:var(--muted); font-size:0.92rem; margin:0.5rem 0 0;}
+  .callout p code{
+    font-family:"JetBrains Mono", monospace; background:var(--surface-2); padding:0.1em 0.35em;
+    border-radius:4px; font-size:0.85em; color:var(--ink);
+  }
+
+  section{margin-bottom:3rem;}
+  .section-head{display:flex; align-items:baseline; justify-content:space-between; gap:1rem; margin-bottom:1.1rem; flex-wrap:wrap;}
+  .section-head h2{font-size:1.3rem; font-weight:600;}
+  .section-head .hint{font-size:0.82rem; color:var(--muted-2); font-family:"JetBrains Mono", monospace;}
+
+  /* Standings table */
+  .table-scroll{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--surface); box-shadow:var(--shadow);}
+  table.standings{width:100%; border-collapse:collapse; min-width:760px;}
+  table.standings th{
+    text-align:left; font-family:"JetBrains Mono", monospace; font-size:0.68rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--muted-2); font-weight:500; padding:0.85rem 1rem; border-bottom:1px solid var(--line);
+    background:var(--surface-2);
+  }
+  table.standings td{padding:0.85rem 1rem; border-bottom:1px solid var(--line); vertical-align:middle;}
+  table.standings tr:last-child td{border-bottom:none;}
+  table.standings tbody tr:hover{background:var(--surface-2);}
+  .num{font-family:"JetBrains Mono", monospace; font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .rank-cell{font-family:"JetBrains Mono",monospace; color:var(--muted-2); font-size:0.9rem;}
+  .country-cell{font-weight:600;}
+  .country-cell .country-inner{display:flex; align-items:center; gap:0.55rem;}
+  .watching{
+    font-family:"JetBrains Mono", monospace; font-size:0.62rem; letter-spacing:0.08em; text-transform:uppercase;
+    background:var(--accent); color:var(--surface); padding:0.2em 0.5em; border-radius:4px; font-weight:600;
+  }
+  tr.mine{background:linear-gradient(90deg, var(--fav-bg), transparent 70%);}
+  tr.mine td:first-child{box-shadow:inset 3px 0 0 var(--fav);}
+
+  .swing-cell{min-width:220px;}
+  .swing-track{position:relative; height:7px; background:var(--track); border-radius:99px; margin-bottom:0.4rem;}
+  .swing-fill{position:absolute; left:0; top:0; height:100%; background:var(--fav); border-radius:99px;}
+  .swing-dot{position:absolute; top:50%; width:9px; height:9px; border-radius:50%; background:var(--accent); border:2px solid var(--surface); transform:translate(-50%,-50%);}
+  .swing-text{font-family:"JetBrains Mono", monospace; font-size:0.76rem; color:var(--muted);}
+  .swing-text b{color:var(--ink); font-weight:600;}
+
+  .clubs-cell{font-size:0.82rem; color:var(--muted); max-width:180px;}
+
+  /* Fixture cards */
+  .country-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(310px,1fr)); gap:1rem;}
+  .country-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1.1rem 1.2rem 1.2rem;
+    box-shadow:var(--shadow); display:flex; flex-direction:column; gap:0.7rem;
+  }
+  .country-card.mine{border-color:var(--fav); box-shadow:var(--shadow), 0 0 0 1px var(--fav);}
+  .card-head{display:flex; align-items:center; justify-content:space-between;}
+  .card-head h3{font-size:1rem; font-weight:600; text-transform:none; letter-spacing:0; display:flex; align-items:center; gap:0.5em;}
+  .rank-chip{
+    font-family:"JetBrains Mono", monospace; font-size:0.68rem; color:var(--muted-2); border:1px solid var(--line);
+    border-radius:99px; padding:0.15em 0.6em;
+  }
+  .fixture{border-top:1px solid var(--line); padding-top:0.6rem;}
+  .fixture:first-of-type{border-top:none; padding-top:0;}
+  .fixture-top{display:flex; align-items:center; justify-content:space-between; gap:0.6rem; margin-bottom:0.3rem;}
+  .comp-badge{
+    font-family:"JetBrains Mono", monospace; font-size:0.62rem; letter-spacing:0.06em; font-weight:600;
+    padding:0.15em 0.5em; border-radius:4px; text-transform:uppercase; flex-shrink:0;
+  }
+  .comp-badge.ucl{background:color-mix(in srgb, var(--ucl) 18%, transparent); color:var(--ucl);}
+  .comp-badge.uel{background:color-mix(in srgb, var(--uel) 18%, transparent); color:var(--uel);}
+  .comp-badge.uecl{background:color-mix(in srgb, var(--uecl) 18%, transparent); color:var(--uecl);}
+  .matchup{font-size:0.92rem; font-weight:600;}
+  .matchup .vs{color:var(--muted-2); font-weight:400; margin:0 0.35em;}
+  .fixture-meta{display:flex; align-items:center; justify-content:space-between; gap:0.6rem; font-size:0.8rem; color:var(--muted);}
+  .agg{font-family:"JetBrains Mono", monospace; font-variant-numeric:tabular-nums; color:var(--ink); font-weight:600;}
+  .stakes{
+    font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; font-family:"JetBrains Mono", monospace;
+    padding:0.15em 0.55em; border-radius:4px; font-weight:600; flex-shrink:0;
+  }
+  .stakes.fav{background:var(--fav-bg); color:var(--fav);}
+  .stakes.level{background:var(--level-bg); color:var(--level);}
+  .stakes.dog{background:var(--dog-bg); color:var(--dog);}
+  .venue{font-size:0.78rem; color:var(--muted-2); margin-top:0.15rem;}
+
+  /* Methodology */
+  .method{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1.5rem 1.6rem;
+    box-shadow:var(--shadow);
+  }
+  .method h2{font-size:1.05rem; margin-bottom:0.8rem;}
+  .method p, .method li{color:var(--muted); font-size:0.9rem; max-width:70ch;}
+  .method ol{padding-left:1.2rem; margin:0.6rem 0;}
+  .method .formula{
+    font-family:"JetBrains Mono", monospace; background:var(--surface-2); padding:0.9rem 1rem; border-radius:8px;
+    font-size:0.84rem; color:var(--ink); margin:0.8rem 0; overflow-x:auto;
+  }
+  footer.sources{margin-top:1.4rem; padding-top:1.2rem; border-top:1px solid var(--line); font-size:0.78rem; color:var(--muted-2);}
+  footer.sources a{color:var(--accent); text-decoration:none; border-bottom:1px solid color-mix(in srgb, var(--accent) 40%, transparent);}
+  footer.sources a:hover{border-bottom-color:var(--accent);}
+  footer.sources ul{list-style:none; padding:0; margin:0.5rem 0 0; display:flex; flex-wrap:wrap; gap:0.9rem 1.4rem;}
+
+  a:focus-visible, button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* Just-in results strip */
+  .justin{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:1.1rem 1.3rem; margin-bottom:2rem; box-shadow:var(--shadow);
+  }
+  .justin-head{display:flex; align-items:baseline; gap:0.7rem; margin-bottom:0.8rem; flex-wrap:wrap;}
+  .justin-head .tag{
+    font-family:"JetBrains Mono", monospace; font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--accent); font-weight:600;
+  }
+  .justin-head span.when{font-size:0.82rem; color:var(--muted-2);}
+  .justin-rows{display:grid; gap:0.55rem;}
+  .justin-row{
+    display:flex; align-items:center; gap:0.7rem; font-size:0.88rem; flex-wrap:wrap;
+    padding:0.5rem 0.6rem; border-radius:8px; background:var(--surface-2);
+  }
+  .outcome-chip{
+    font-family:"JetBrains Mono", monospace; font-size:0.64rem; text-transform:uppercase; letter-spacing:0.06em;
+    font-weight:700; padding:0.15em 0.55em; border-radius:4px; flex-shrink:0;
+  }
+  .outcome-chip.upset{background:var(--dog-bg); color:var(--dog);}
+  .outcome-chip.through{background:var(--fav-bg); color:var(--fav);}
+  .justin-row .detail{color:var(--muted); font-size:0.82rem;}
+  .justin-note{font-size:0.8rem; color:var(--muted-2); margin-top:0.6rem;}
+
+  /* Decided fixtures */
+  .fixture.final .matchup{opacity:0.92;}
+  .ft-badge{
+    font-family:"JetBrains Mono", monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase;
+    font-weight:700; padding:0.15em 0.5em; border-radius:4px; background:var(--surface-2); color:var(--muted-2);
+    border:1px solid var(--line); flex-shrink:0;
+  }
+  .stakes.through{background:var(--fav-bg); color:var(--fav);}
+  .stakes.eliminated{background:var(--dog-bg); color:var(--dog);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">UEFA coefficient watch</div>
+    <h1>Denmark's neighbourhood, decided this week</h1>
+    <p class="lede">The play-off round is the last qualifying step before the Champions League, Europa League and Conference League league phases. Every second leg this week adds match points to a club's national association — the last update before Thursday night settles who's in.</p>
+    <div class="hero-meta">
+      <span>Second legs: <strong>Tue 25 – Thu 27 Aug 2026</strong></span>
+      <span>Countries tracked: <strong>5 above, 5 below Denmark</strong></span>
+      <span>Ties still to be decided: <strong>33 of 39</strong></span>
+      <span>Updated: <strong>Thu 27 Aug morning — corrected for secured league-phase points</strong></span>
+    </div>
+  </header>
+
+  <div class="justin">
+    <div class="justin-head">
+      <span class="tag">Correction</span>
+      <span class="when">Champions League qualifiers bank a guaranteed bonus the moment they're through — not just their match points</span>
+    </div>
+    <div class="justin-rows">
+      <div class="justin-row">
+        <span class="outcome-chip through">+6.000</span>
+        <strong>Every club that reaches the Champions League league phase</strong>
+        <span class="detail">is guaranteed at least 6.000 points toward its country's coefficient the moment it qualifies — even before a ball is kicked in the league phase. That floor rises to as much as 12.000 depending on final ranking in January, per UEFA's Annex D.5.</span>
+      </div>
+      <div class="justin-row">
+        <span class="outcome-chip upset">+0.000 floor</span>
+        <strong>Europa &amp; Conference League qualifiers get no such guarantee</strong>
+        <span class="detail">— their bottom-of-the-table bonus is 0.000, so reaching the league phase there pays off only through the matches themselves, same as this week's swing figures already assumed.</span>
+      </div>
+    </div>
+    <p class="justin-note">This resets the standings meaningfully: <strong>Norway has already passed Denmark</strong>, on the back of Bodø/Glimt's and Viking's Champions League places. Netherlands has dropped out of your tracked window; Austria has entered it. Full detail below — and thank you for the catch.</p>
+  </div>
+
+  <div class="callouts">
+    <div class="callout correction">
+      <div class="tag">Reordered</div>
+      <h3>Norway has already passed Denmark</h3>
+      <p>Bodø/Glimt and Viking each banked <code>+6.000</code> for reaching the Champions League league phase, jumping Norway to <code>38.212</code> — past Denmark's <code>37.556</code>. Denmark is 14th this morning, not 13th.</p>
+    </div>
+    <div class="callout watch">
+      <div class="tag">Live tonight</div>
+      <h3>Denmark can take 13th back</h3>
+      <p>The gap is only <code>0.656</code>. Denmark's four clubs can add up to <code>+1.00</code> tonight; Norway's three remaining add up to <code>+0.60</code>. Roughly three Danish wins with Norway drawing blanks would retake the spot — tight, but very much alive.</p>
+    </div>
+    <div class="callout watch">
+      <div class="tag">New this week</div>
+      <h3>Czechia could leapfrog Poland at 10th</h3>
+      <p>Only <code>0.500</code> separates them — smaller than Czechia's <code>+0.60</code> ceiling from Hradec Králové, Plzeň and Jablonec. If Czechia's trio outperforms Poland's four tonight, 10th and 11th swap.</p>
+    </div>
+  </div>
+
+  <section id="standings">
+    <div class="section-head">
+      <h2>Standings &amp; this week's swing</h2>
+      <span class="hint">5-year coefficient · rank for 2026/27</span>
+    </div>
+    <div class="table-scroll">
+      <table class="standings">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Country</th>
+            <th>Total coeff.</th>
+            <th>This week's range</th>
+            <th>Clubs alive</th>
+          </tr>
+        </thead>
+        <tbody id="standings-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="fixtures">
+    <div class="section-head">
+      <h2>Every tie that matters</h2>
+      <span class="hint">aggregate score entering the second leg</span>
+    </div>
+    <div class="country-grid" id="country-grid"></div>
+  </section>
+
+  <section class="method">
+    <h2>How this is built</h2>
+    <p>Association coefficient points come from two separate sources, and the second one is easy to miss. First, per-match points: in the play-off round — still a qualifying stage — a win is worth <strong>1.0 point</strong> and a draw <strong>0.5</strong>, exactly half of the 2/1/0 clubs earn once the league phase starts. Those count for both sides of a two-legged tie, added to whichever country regardless of aggregate result.</p>
+    <p>Second, and this is the correction from the previous version of this page: <strong>league-phase bonus points</strong>, awarded under UEFA's Annex D.5 by final ranking in the 36-team table (1st through 36th) once the league phase ends in January. Champions League ranges from 12.000 points down to a guaranteed floor of <strong>6.000</strong> even for a last-place finish — so the instant a club secures a CL place, its country has already banked at least 6.000 points, win or lose from here. Europa League and Conference League have no such floor: their bottom band is 0.000, so qualifying there pays off only through the matches actually played, exactly as this week's swing figures already assume.</p>
+    <div class="formula">country's season points  =  Σ (match points + secured league-phase bonus, per club)  ÷  (clubs that country entered this season)</div>
+    <p>That divisor is fixed for the season once qualifying paths are set. This week's "range" per country is simply what's still live: each remaining alive club's leg-two result (0, 0.5 or 1.0), summed and divided by the club count — the Champions League bonus is already reflected in the standing totals below for every country that has clinched a CL place. The much bigger prize a qualification unlocks is the eight further matches at full value plus that January ranking bonus — the real lever for next year's ranking, and one this page can't finalise until the league phase actually plays out.</p>
+    <p>Rankings and season-to-date totals are taken directly from kassiesa.net's own live table (kindly checked and corrected against this page) rather than reconstructed — kassiesa.net blocks automated fetching, so this page can't refresh itself against it and instead relies on you confirming the figures periodically.</p>
+    <footer class="sources">
+      Sources — standings &amp; season points: <a href="https://www.football-coefficient.eu/" target="_blank" rel="noopener">football-coefficient.eu</a>, <a href="https://euroranking.net/en/association-coefficient/" target="_blank" rel="noopener">euroranking.net</a>, <a href="https://www.footballseeding.com/uefa/country-ranking/2026-27/" target="_blank" rel="noopener">footballseeding.com</a> · live authority: <a href="https://kassiesa.net/uefa/data/method5/crank2027.html" target="_blank" rel="noopener">kassiesa.net</a>
+      <ul>
+        <li>Fixtures &amp; results: Wikipedia qualifying articles (CL/EL/ECL 2026–27), UEFA.com play-off draws &amp; <a href="https://www.uefa.com/uefachampionsleague/news/02a8-216f6e7c7e3c-fa74783c353d-1000--champions-league-play-off-second-legs-round-up-sabah-lask-/" target="_blank" rel="noopener">Tuesday's round-up</a>, ESPN, Terrikon</li>
+        <li>Methodology: <a href="https://www.uefa.com/nationalassociations/uefarankings/country/about/" target="_blank" rel="noopener">uefa.com — how coefficients are calculated</a>, <a href="https://documents.uefa.com/r/Regulations-of-the-UEFA-Champions-League-2026/27/D.5-Bonus-points-Online" target="_blank" rel="noopener">UEFA Champions League regulations, Annex D.5</a></li>
+        <li>Current standings: kassiesa.net (supplied directly by you, 27 Aug)</li>
+      </ul>
+    </footer>
+  </section>
+
+</div>
+
+<script>
+const COUNTRIES = [
+  {rank:9, name:"Türkiye", total:49.675, season:4.500, divisor:5, minSwing:0.000, maxSwing:0.400, clubsAlive:2, clubsDone:1, mine:false},
+  {rank:10, name:"Poland", total:44.825, season:2.700, divisor:5, minSwing:0.000, maxSwing:0.800, clubsAlive:4, clubsDone:0, mine:false},
+  {rank:11, name:"Czechia", total:44.325, season:2.500, divisor:5, minSwing:0.000, maxSwing:0.600, clubsAlive:3, clubsDone:0, mine:false},
+  {rank:12, name:"Greece", total:43.412, season:3.000, divisor:5, minSwing:0.000, maxSwing:0.600, clubsAlive:3, clubsDone:1, mine:false},
+  {rank:13, name:"Norway", total:38.212, season:4.600, divisor:5, minSwing:0.000, maxSwing:0.600, clubsAlive:3, clubsDone:2, mine:false},
+  {rank:14, name:"Denmark", total:37.556, season:3.250, divisor:4, minSwing:0.000, maxSwing:1.000, clubsAlive:4, clubsDone:0, mine:true},
+  {rank:15, name:"Cyprus", total:33.693, season:2.125, divisor:4, minSwing:0.000, maxSwing:0.500, clubsAlive:2, clubsDone:0, mine:false},
+  {rank:16, name:"Switzerland", total:29.950, season:3.000, divisor:4, minSwing:0.000, maxSwing:1.000, clubsAlive:4, clubsDone:0, mine:false},
+  {rank:17, name:"Austria", total:27.350, season:3.900, divisor:5, minSwing:0.000, maxSwing:0.600, clubsAlive:3, clubsDone:1, mine:false},
+  {rank:18, name:"Hungary", total:27.062, season:2.625, divisor:4, minSwing:0.000, maxSwing:0.250, clubsAlive:1, clubsDone:0, mine:false},
+  {rank:19, name:"Scotland", total:26.250, season:2.100, divisor:5, minSwing:0.000, maxSwing:0.800, clubsAlive:4, clubsDone:1, mine:false},
+];
+
+const FIXTURES = {
+  "Türkiye": [
+    {comp:"ucl", club:"Fenerbahçe", opp:"Lyon (FRA)", agg:"3–2", aggNote:"through", leg1:"Fenerbahçe 1–1 Lyon · 18 Aug", leg2:"FT: Lyon 1–2 Fenerbahçe · 26 Aug, Lyon", stakes:"through", final:true},
+    {comp:"uel", club:"Beşiktaş", opp:"Kauno Žalgiris (LTU)", agg:"3–0", aggNote:"Beşiktaş lead", leg1:"Beşiktaş 3–0 Žalgiris · 20 Aug", leg2:"Thu 27 Aug · Kaunas (Žalgiris host)", stakes:"fav"},
+    {comp:"uel", club:"Trabzonspor", opp:"Ferencváros (HUN)", agg:"0–1", aggNote:"trail", leg1:"Trabzonspor 0–1 Ferencváros · 20 Aug", leg2:"Thu 27 Aug · Budapest (Ferencváros host)", stakes:"dog"},
+  ],
+  "Poland": [
+    {comp:"uel", club:"Lech Poznań", opp:"Thun (SUI)", agg:"7–0", aggNote:"Lech lead", leg1:"Lech 7–0 Thun · 20 Aug", leg2:"Thu 27 Aug · Thun", stakes:"fav"},
+    {comp:"uel", club:"Jagiellonia Białystok", opp:"Iberia 1999 (GEO)", agg:"4–0", aggNote:"Jagiellonia lead", leg1:"Jagiellonia 4–0 Iberia 1999 · 20 Aug", leg2:"Thu 27 Aug · Tbilisi (Iberia host)", stakes:"fav"},
+    {comp:"uecl", club:"Raków Częstochowa", opp:"Hajduk Split (CRO)", agg:"2–2", aggNote:"level", leg1:"Hajduk 2–2 Raków · 20 Aug", leg2:"Thu 27 Aug · Częstochowa (Raków host)", stakes:"level"},
+    {comp:"uecl", club:"Górnik Zabrze", opp:"Monaco (FRA)", agg:"2–3", aggNote:"trail", leg1:"Górnik 2–3 Monaco · 20 Aug", leg2:"Thu 27 Aug · Monaco", stakes:"dog"},
+  ],
+  "Czechia": [
+    {comp:"uecl", club:"Hradec Králové", opp:"Panathinaikos (GRE)", agg:"2–2", aggNote:"level", leg1:"Panathinaikos 2–2 Hradec · 20 Aug", leg2:"Thu 27 Aug · Hradec Králové", stakes:"level"},
+    {comp:"uel", club:"Viktoria Plzeň", opp:"Crvena Zvezda (SRB)", agg:"0–3", aggNote:"trail heavily", leg1:"Crvena Zvezda 3–0 Plzeň · 20 Aug", leg2:"Thu 27 Aug · Plzeň", stakes:"dog"},
+    {comp:"uecl", club:"Jablonec", opp:"Rangers (SCO)", agg:"0–1", aggNote:"trail", leg1:"Rangers 1–0 Jablonec (10 men) · 20 Aug", leg2:"Thu 27 Aug · Jablonec (Rangers away)", stakes:"dog"},
+  ],
+  "Greece": [
+    {comp:"uel", club:"OFI Crete", opp:"CSKA Sofia (BUL)", agg:"3–0", aggNote:"OFI lead", leg1:"OFI 3–0 CSKA Sofia · 20 Aug", leg2:"Thu 27 Aug · Sofia (CSKA host)", stakes:"fav"},
+    {comp:"ucl", club:"AEK Athens", opp:"Levski Sofia (BUL)", agg:"4–0", aggNote:"through", leg1:"Levski 0–0 AEK · 18 Aug", leg2:"FT: AEK 4–0 Levski · 26 Aug, Athens", stakes:"through", final:true},
+    {comp:"uecl", club:"Panathinaikos", opp:"Hradec Králové (CZE)", agg:"2–2", aggNote:"level", leg1:"Panathinaikos 2–2 Hradec · 20 Aug", leg2:"Thu 27 Aug · Hradec Králové", stakes:"level"},
+    {comp:"uecl", club:"PAOK", opp:"Brann (NOR)", agg:"1–1", aggNote:"level", leg1:"PAOK 1–1 Brann · 20 Aug", leg2:"Thu 27 Aug · Bergen (Brann host)", stakes:"level"},
+  ],
+  "Denmark": [
+    {comp:"uecl", club:"Midtjylland", opp:"Rijeka (CRO)", agg:"2–0", aggNote:"Midtjylland lead", leg1:"Midtjylland 2–0 Rijeka · 20 Aug", leg2:"Thu 27 Aug · Rijeka", stakes:"fav"},
+    {comp:"uecl", club:"Nordsjælland", opp:"St. Gallen (SUI)", agg:"1–0", aggNote:"Nordsjælland lead", leg1:"Nordsjælland 1–0 St. Gallen · 20 Aug", leg2:"Thu 27 Aug · St. Gallen", stakes:"fav"},
+    {comp:"uecl", club:"Copenhagen", opp:"Inter Turku (FIN)", agg:"0–0", aggNote:"level", leg1:"Inter Turku 0–0 Copenhagen · 20 Aug", leg2:"Thu 27 Aug · Copenhagen (Parken)", stakes:"level"},
+    {comp:"uel", club:"AGF Aarhus", opp:"Benfica (POR)", agg:"1–3", aggNote:"trail", leg1:"Benfica 3–1 Aarhus · 20 Aug", leg2:"Thu 27 Aug · Aarhus (Ceres Park)", stakes:"dog"},
+  ],
+  "Norway": [
+    {comp:"ucl", club:"Bodø/Glimt", opp:"NEC Nijmegen (NED)", agg:"6–1", aggNote:"through", leg1:"NEC 1–3 Bodø/Glimt · 19 Aug", leg2:"FT: Bodø/Glimt 3–0 NEC · 25 Aug, Bodø", stakes:"through", final:true},
+    {comp:"ucl", club:"Viking", opp:"Dinamo Zagreb (CRO)", agg:"5–3", aggNote:"through", leg1:"Dinamo 2–2 Viking · 18 Aug", leg2:"FT: Viking 3–1 Dinamo Zagreb · 26 Aug, Stavanger", stakes:"through", final:true},
+    {comp:"uel", club:"Lillestrøm", opp:"Egnatia (ALB)", agg:"0–0", aggNote:"level", leg1:"Egnatia 0–0 Lillestrøm · 20 Aug", leg2:"Thu 27 Aug · Lillestrøm", stakes:"level"},
+    {comp:"uecl", club:"Tromsø", opp:"Brighton (ENG)", agg:"0–0", aggNote:"level", leg1:"Tromsø 0–0 Brighton · 20 Aug", leg2:"Thu 27 Aug · Brighton (Amex)", stakes:"level"},
+    {comp:"uecl", club:"Brann", opp:"PAOK (GRE)", agg:"1–1", aggNote:"level", leg1:"PAOK 1–1 Brann · 20 Aug", leg2:"Thu 27 Aug · Bergen (Brann host)", stakes:"level"},
+  ],
+  "Cyprus": [
+    {comp:"uecl", club:"Pafos", opp:"Dinamo City (ALB)", agg:"1–1", aggNote:"level", leg1:"Dinamo City 1–1 Pafos · 20 Aug", leg2:"Thu 27 Aug · Pafos", stakes:"level"},
+    {comp:"uel", club:"Omonia", opp:"Sint-Truiden (BEL)", agg:"0–1", aggNote:"trail", leg1:"Sint-Truiden 1–0 Omonia · 20 Aug", leg2:"Thu 27 Aug · Nicosia (Omonia host)", stakes:"dog"},
+  ],
+  "Switzerland": [
+    {comp:"uecl", club:"Lugano", opp:"Maccabi Tel-Aviv (ISR)", agg:"2–1", aggNote:"Lugano lead", leg1:"Lugano 2–1 Maccabi · 20 Aug", leg2:"Thu 27 Aug · hosted by Maccabi (venue tbc)", stakes:"fav"},
+    {comp:"uecl", club:"St. Gallen", opp:"Nordsjælland (DEN)", agg:"0–1", aggNote:"trail", leg1:"Nordsjælland 1–0 St. Gallen · 20 Aug", leg2:"Thu 27 Aug · St. Gallen", stakes:"dog"},
+    {comp:"uecl", club:"Sion", opp:"Ajax (NED)", agg:"2–4", aggNote:"trail", leg1:"Sion 2–4 Ajax · 20 Aug", leg2:"Thu 27 Aug · Amsterdam (Ajax host)", stakes:"dog"},
+    {comp:"uel", club:"Thun", opp:"Lech Poznań (POL)", agg:"0–7", aggNote:"trail heavily", leg1:"Lech 7–0 Thun · 20 Aug", leg2:"Thu 27 Aug · Thun", stakes:"dog"},
+  ],
+  "Austria": [
+    {comp:"ucl", club:"LASK", opp:"Celtic (SCO)", agg:"5–4", aggNote:"through — huge upset", leg1:"Celtic 3–0 LASK · 19 Aug", leg2:"FT: LASK 5–1 Celtic (aet) · 25 Aug, Linz", stakes:"through", final:true},
+    {comp:"uel", club:"RB Salzburg", opp:"Mjällby AIF (SWE)", agg:"1–0", aggNote:"Salzburg lead", leg1:"Mjällby 0–1 Salzburg · 20 Aug", leg2:"Thu 27 Aug · Salzburg", stakes:"fav"},
+    {comp:"uecl", club:"Rapid Wien", opp:"Hearts (SCO)", agg:"2–2", aggNote:"level", leg1:"Hearts 2–2 Rapid Wien · 20 Aug", leg2:"Thu 27 Aug · Vienna", stakes:"level"},
+    {comp:"uecl", club:"Austria Wien", opp:"Braga (POR)", agg:"0–2", aggNote:"trail", leg1:"Braga 2–0 Austria Wien · 20 Aug", leg2:"Thu 27 Aug · Vienna", stakes:"dog"},
+  ],
+  "Hungary": [
+    {comp:"uel", club:"Ferencváros", opp:"Trabzonspor (TUR)", agg:"1–0", aggNote:"Ferencváros lead", leg1:"Trabzonspor 0–1 Ferencváros · 20 Aug", leg2:"Thu 27 Aug · Budapest (Ferencváros host)", stakes:"fav"},
+  ],
+  "Scotland": [
+    {comp:"ucl", club:"Celtic", opp:"LASK (AUT)", agg:"4–5", aggNote:"eliminated — huge upset", leg1:"Celtic 3–0 LASK · 19 Aug", leg2:"FT: LASK 5–1 Celtic (aet) · 25 Aug, Linz", stakes:"eliminated", final:true},
+    {comp:"uecl", club:"Rangers", opp:"Jablonec (CZE)", agg:"1–0", aggNote:"Rangers lead", leg1:"Rangers 1–0 Jablonec (10 men) · 20 Aug", leg2:"Thu 27 Aug · Jablonec", stakes:"fav"},
+    {comp:"uecl", club:"Hearts", opp:"Rapid Wien (AUT)", agg:"2–2", aggNote:"level", leg1:"Hearts 2–2 Rapid Vienna · 20 Aug", leg2:"Thu 27 Aug · Vienna", stakes:"level"},
+    {comp:"uecl", club:"Hibernian", opp:"Gent (BEL)", agg:"0–0", aggNote:"level", leg1:"Gent 0–0 Hibernian · 20 Aug", leg2:"Thu 27 Aug · Edinburgh (Easter Road)", stakes:"level"},
+    {comp:"uecl", club:"Motherwell", opp:"Freiburg (GER)", agg:"1–3", aggNote:"trail", leg1:"Motherwell 1–3 Freiburg · 20 Aug", leg2:"Thu 27 Aug · Freiburg", stakes:"dog"},
+  ],
+};
+
+const compLabel = {ucl:"UCL", uel:"UEL", uecl:"UECL"};
+const stakesLabel = {fav:"Favourite", level:"Level", dog:"Underdog", through:"Through", eliminated:"Eliminated"};
+
+function fmt(n){ return n.toFixed(3); }
+
+const overallMaxSwing = Math.max(...COUNTRIES.map(c => c.maxSwing));
+
+const tbody = document.getElementById("standings-body");
+COUNTRIES.forEach(c => {
+  const tr = document.createElement("tr");
+  if(c.mine) tr.className = "mine";
+  const startPct = (c.minSwing / overallMaxSwing) * 100;
+  const fillPct = ((c.maxSwing - c.minSwing) / overallMaxSwing) * 100;
+  const clubsNote = c.clubsDone > 0
+    ? `${c.clubsAlive} to play · ${c.clubsDone} done`
+    : `${c.clubsAlive} club${c.clubsAlive===1?'':'s'} to play`;
+  tr.innerHTML = `
+    <td class="rank-cell">${c.rank}</td>
+    <td class="country-cell"><span class="country-inner">${c.name}${c.mine ? '<span class="watching">watching</span>' : ''}</span></td>
+    <td class="num">${fmt(c.total)}</td>
+    <td class="swing-cell">
+      <div class="swing-track">
+        <div class="swing-fill" style="left:${startPct}%; width:${fillPct}%;"></div>
+        <div class="swing-dot" style="left:${(c.maxSwing / overallMaxSwing) * 100}%;"></div>
+      </div>
+      <div class="swing-text"><b>+${fmt(c.minSwing)}</b> to <b>+${fmt(c.maxSwing)}</b> → up to <b>${fmt(c.total + c.maxSwing)}</b></div>
+    </td>
+    <td class="clubs-cell">${clubsNote}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+const grid = document.getElementById("country-grid");
+COUNTRIES.forEach(c => {
+  const card = document.createElement("div");
+  card.className = "country-card" + (c.mine ? " mine" : "");
+  const fixturesHtml = (FIXTURES[c.name] || []).map(f => `
+    <div class="fixture${f.final ? ' final' : ''}">
+      <div class="fixture-top">
+        <span style="display:flex; gap:0.4rem; align-items:center;">
+          <span class="comp-badge ${f.comp}">${compLabel[f.comp]}</span>
+          ${f.final ? '<span class="ft-badge">Full time</span>' : ''}
+        </span>
+        <span class="stakes ${f.stakes}">${stakesLabel[f.stakes]}</span>
+      </div>
+      <div class="matchup">${f.club}<span class="vs">vs</span>${f.opp}</div>
+      <div class="fixture-meta">
+        <span>Agg <span class="agg">${f.agg}</span> — ${f.aggNote}</span>
+      </div>
+      <div class="venue">${f.leg2}</div>
+    </div>
+  `).join("");
+  card.innerHTML = `
+    <div class="card-head">
+      <h3>${c.name}${c.mine ? '<span class="watching">watching</span>' : ''}</h3>
+      <span class="rank-chip">#${c.rank} · ${fmt(c.total)}</span>
+    </div>
+    ${fixturesHtml}
+  `;
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>
