@@ -218,6 +218,7 @@ tr.dk .flag { background: var(--ink); color: var(--bg); border-color: var(--ink)
     <h2 style="font-size:16px">Effekt for de fem lande med den forventede placering</h2>
     <p class="sub">Sandsynlighed for hver gruppe og det forventede antal pladser i hver turnering. Alle fem lande får i alt 5 hold, så effekten ligger i fordelingen.</p>
     <div class="scroll"><table id="effectTbl"></table></div>
+    <p class="sub" style="margin:10px 0 0">Forventet plads følger rækkefølgen af forventet slutværdi. Gennemsnitsplads og sandsynlighed for plads 10–12 regnes pr. land ud fra fordelingen i skemaet ovenfor. Danmark og Polen har begge flest simuleringer på nr. 13 hver for sig (32 % og 45 %), men kan ikke begge få den plads, så tallene pr. plads skal læses sammen med gennemsnittet.</p>
   </section>
 
   <section class="card">
@@ -384,13 +385,13 @@ const byFinal = [...ORDER].sort((a,b) => SUM[b].total_final - SUM[a].total_final
   });
   document.getElementById("accessTbl").innerHTML = h + "</tbody>";
 
-  let e = `<thead><tr><th class="l">Land</th><th>Mest sandsynlig</th><th>Gns. plads</th><th>Plads 10–12</th><th>UCL direkte</th><th>Europa L.</th><th>Conference L.</th></tr></thead><tbody>`;
-  byFinal.forEach(c => {
+  let e = `<thead><tr><th class="l">Land</th><th>Forventet plads</th><th>Gns. plads</th><th>Plads 10–12</th><th>UCL direkte</th><th>Europa L.</th><th>Conference L.</th></tr></thead><tbody>`;
+  byFinal.forEach((c) => {
     const r = DATA.rank5[c];
     const pTop = r[0] + r[1] + r[2];
     const modeI = r.indexOf(Math.max(...r));
     const mean = r.reduce((a,p,i) => a + p*(i+10), 0);
-    e += `<tr class="${c==="DEN"?"dk":""}"><td class="l strong">${flag(c)}${NAME[c]}</td><td>nr. ${modeI+10} <span class="dim">(${Math.round(r[modeI]*100)} %)</span></td><td>${f(mean,1)}</td><td class="strong">${Math.round(pTop*100)} %<span class="pbar2"><b style="width:${pTop*100}%"></b></span></td><td>${f(pTop,2)}</td><td>${f(1+pTop,2)}</td><td>${f(2-pTop,2)}</td></tr>`;
+    e += `<tr class="${c==="DEN"?"dk":""}"><td class="l strong">${flag(c)}${NAME[c]}</td><td>nr. ${byFinal.indexOf(c)+10}</td><td>${f(mean,1)}</td><td class="strong">${Math.round(pTop*100)} %<span class="pbar2"><b style="width:${pTop*100}%"></b></span></td><td>${f(pTop,2)}</td><td>${f(1+pTop,2)}</td><td>${f(2-pTop,2)}</td></tr>`;
   });
   document.getElementById("effectTbl").innerHTML = e + "</tbody>";
 })();
