@@ -135,6 +135,17 @@ tr.dk .flag { background: var(--ink); color: var(--bg); border-color: var(--ink)
 .notes { font-size: 13.5px; color: var(--ink2); max-width: 78ch; }
 .notes p { margin: 0 0 9px; }
 .notes b { color: var(--ink); }
+/* access / effect */
+.access td.l, .access th.l { white-space: normal; }
+.access tr.in td { background: var(--hl); }
+.access tr.edge td { border-bottom: 2px solid var(--ink); }
+.access td .sm { color: var(--ink2); font-size: 12.5px; }
+.delta { margin: 14px 0 0; padding: 12px 14px; border-left: 3px solid var(--ink); background: var(--hl); border-radius: 0 8px 8px 0; font-size: 14px; max-width: 78ch; }
+.pbar2 { display: inline-block; vertical-align: middle; width: 70px; height: 8px; border-radius: 4px; background: var(--grid); position: relative; overflow: hidden; margin-left: 8px; }
+.pbar2 b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); border-radius: 4px 0 0 4px; }
+.heat .br { grid-column: span 3; text-align: center; font-size: 11.5px; line-height: 1.25; color: var(--ink2); border-bottom: 2px solid var(--ink); padding: 0 2px 5px; margin-bottom: 4px; font-weight: 600; }
+.heat .br.b2 { grid-column: span 2; border-bottom-color: var(--axis); }
+.heat .br span { display: block; font-weight: 400; font-size: 11px; }
 #tip { position: fixed; z-index: 30; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 12.5px; line-height: 1.4; padding: 7px 10px; border-radius: 6px; max-width: 280px; opacity: 0; transition: opacity .08s; font-variant-numeric: tabular-nums; }
 @media (max-width: 560px) {
   .card { padding: 14px 12px; }
@@ -199,6 +210,17 @@ tr.dk .flag { background: var(--ink); color: var(--bg); border-color: var(--ink)
   </section>
 
   <section class="card">
+    <h2>Hvad betyder placeringen?</h2>
+    <p class="sub">Antal europæiske pladser et land får efter placering på 5-årsranglisten. De fem lande kæmper om pladserne 10–14, og den eneste grænse, der betyder noget for dem, går mellem nr. 12 og nr. 13.</p>
+    <div class="scroll"><table class="access" id="accessTbl"></table></div>
+    <p class="delta"><b>Fra nr. 13 til nr. 12:</b> ét ekstra hold i Europa League og ét færre i Conference League, og landets Champions League-hold går direkte i ligafasen i stedet for begge at skulle gennem kvalifikationen. Pladserne 10, 11 og 12 giver det samme, og det samme gælder 13, 14 og 15.</p>
+    <div style="height:20px"></div>
+    <h2 style="font-size:16px">Effekt for de fem lande med den forventede placering</h2>
+    <p class="sub">Sandsynlighed for hver gruppe og det forventede antal pladser i hver turnering. Alle fem lande får i alt 5 hold, så effekten ligger i fordelingen.</p>
+    <div class="scroll"><table id="effectTbl"></table></div>
+  </section>
+
+  <section class="card">
     <h2>Klubberne bag tallene</h2>
     <p class="sub">Sandsynlighed for at nå hvert trin og forventede klubpoint fra nu (før division med landets klubantal). Placering er forventet slutplacering i ligafasen (1–36).</p>
     <div class="scroll"><table id="clubTbl"></table></div>
@@ -227,6 +249,7 @@ tr.dk .flag { background: var(--ink); color: var(--bg); border-color: var(--ink)
     <p><b>Ratings.</b> Elo-ækvivalente ratings fra StatsUltra (ClubElo kunne ikke hentes). Fire Europa League-klubber og elleve Conference League-klubber uden rating er tildelt skøn fra klubbens liga. Danmark er mest følsom over for disse skøn, fordi alle fire danske klubber spiller i Conference League. Skønnene ±60 Elo flytter Danmarks slutværdi mellem 47,8 og 48,7 og sandsynligheden for at slå Polen mellem 46 % og 57 %.</p>
     <p><b>Robusthed.</b> Ændringer i hjemmebanefordel (60–100), målniveau (1,35–1,65 mål pr. hold) og tilfældig ratingstøj (0–60 Elo) flytter ikke noget lands forventede slutværdi mere end ca. 0,2 point. Rækkefølgen Grækenland > Tjekkiet > Danmark ≈ Polen > Norge holder i alle kørsler.</p>
     <p><b>Det kan modellen ikke.</b> Skader, rotation, formkurver og det faktiske lodtrækningsresultat kender den ikke, og den er kun kørt for disse fem lande. Resten af ranglisten er ikke simuleret, så placeringer i forhold til fx Belgien eller Skotland indgår ikke.</p>
+    <p><b>Adgangstabellen.</b> Oversigten over pladser pr. rangliste-placering er en oversigt, som sidens ejer har leveret, og er ikke verificeret mod UEFAs reglement. Tjek den mod UEFAs officielle adgangsliste, før den bruges som facit. "UCL direkte", "Europa League" og "Conference League" i effekt-tabellen er forventede antal pladser, når tabellen anvendes på placeringssandsynlighederne ovenfor, og antager at landene beholder pladserne 10–14.</p>
     <p class="muted">Kilder: kassiesa.net (stilling og bilag D.5), StatsUltra (ratings), UEFA.com (programmer og tabeller).</p>
   </section>
 </div>
@@ -256,6 +279,7 @@ const byFinal = [...ORDER].sort((a,b) => SUM[b].total_final - SUM[a].total_final
   const tiles = [
     {k:"Danmarks forventede slutværdi", v:f(d.total_final,1), d:`Fra ${f(d.total_now,1)} i dag. 80 %-interval ${f(d.total_p10,1)}–${f(d.total_p90,1)}. ${Math.round(top3*100)} % for at ende som nr. 12 eller bedre.`},
     {k:"Resterende tillæg", v:"+"+f(d.exp_add), d: maxAdd === "DEN" ? `Størst af de fem (Grækenland +${f(SUM.GRE.exp_add)}, Norge +${f(SUM.NOR.exp_add)}, Tjekkiet +${f(SUM.CZE.exp_add)}, Polen +${f(SUM.POL.exp_add)}). Dansk sæsonværdi: ${f(d.season_now,3)} → ${f(d.season_final,2)}.` : ""},
+    {k:"Grænsen går ved nr. 12", v:Math.round(top3*100)+" %", d:`Danmarks sandsynlighed for at nå plads 10–12 og dermed ekstra Europa League-plads og direkte Champions League-hold i ligafasen. Plads 13–14 giver i stedet to Conference League-hold.`},
     {k:"Heraf bonus for Danmark", v:"+"+f(bonusOf("DEN")), d:`${f(d.bonus)} fra ligafaseplacering og ${f(d.ko_bonus)} fra knockout-runder. Grækenland forventer ${f(bonusOf("GRE"))}, Polen kun ${f(bonusOf("POL"))}.`}
   ];
   document.getElementById("tiles").innerHTML = tiles.map(t => `<div class="tile"><div class="k">${t.k}</div><div class="v">${t.v}</div><div class="d">${t.d}</div></div>`).join("");
@@ -308,7 +332,7 @@ const byFinal = [...ORDER].sort((a,b) => SUM[b].total_final - SUM[a].total_final
 
 /* heatmap */
 (function(){
-  let h = `<div></div>` + [10,11,12,13,14].map(i => `<div class="h">Nr. ${i}</div>`).join("");
+  let h = `<div></div><div class="br">Plads 10–12<span>2 UEL · 1 UECL</span></div><div class="br b2">Plads 13–14<span>1 UEL · 2 UECL</span></div><div></div>` + [10,11,12,13,14].map(i => `<div class="h">Nr. ${i}</div>`).join("");
   byFinal.forEach(c => {
     h += `<div class="lab">${flag(c)}${NAME[c]}</div>`;
     DATA.rank5[c].forEach((p,i) => {
@@ -342,6 +366,33 @@ const byFinal = [...ORDER].sort((a,b) => SUM[b].total_final - SUM[a].total_final
     });
   });
   document.getElementById("clubTbl").innerHTML = h + "</tbody>";
+})();
+
+/* access + effect */
+(function(){
+  const rows = [
+    ["Top 1–5","7 eller 8 hold","4 hold (direkte i ligafasen)","2 hold","1 hold",false,false],
+    ["Nr. 6","6 hold","3 hold (2 direkte + 1 i kval.)","2 hold","1 hold",false,false],
+    ["Nr. 7–9","5 hold","2 hold (1 direkte + 1 i kval.)","2 hold","1 hold",false,false],
+    ["Nr. 10–12","5 hold","2 hold (1 direkte + 1 i kval.)","2 hold","1 hold",true,true],
+    ["Nr. 13–15","5 hold","2 hold (begge i tidlig kval.)","1 hold","2 hold",true,false],
+    ["Nr. 16–50","4 hold","1 hold (i kval.)","1 hold","2 hold",false,false]
+  ];
+  let h = `<thead><tr><th class="l">Landets placering</th><th class="l">Hold i alt</th><th class="l">Champions League</th><th class="l">Europa League</th><th class="l">Conference League</th></tr></thead><tbody>`;
+  rows.forEach(r => {
+    h += `<tr class="${r[5]?"in":""} ${r[6]?"edge":""}"><td class="l strong">${r[0]}</td><td class="l">${r[1]}</td><td class="l">${r[2]}</td><td class="l">${r[3]}</td><td class="l">${r[4]}</td></tr>`;
+  });
+  document.getElementById("accessTbl").innerHTML = h + "</tbody>";
+
+  let e = `<thead><tr><th class="l">Land</th><th>Mest sandsynlig</th><th>Gns. plads</th><th>Plads 10–12</th><th>UCL direkte</th><th>Europa L.</th><th>Conference L.</th></tr></thead><tbody>`;
+  byFinal.forEach(c => {
+    const r = DATA.rank5[c];
+    const pTop = r[0] + r[1] + r[2];
+    const modeI = r.indexOf(Math.max(...r));
+    const mean = r.reduce((a,p,i) => a + p*(i+10), 0);
+    e += `<tr class="${c==="DEN"?"dk":""}"><td class="l strong">${flag(c)}${NAME[c]}</td><td>nr. ${modeI+10} <span class="dim">(${Math.round(r[modeI]*100)} %)</span></td><td>${f(mean,1)}</td><td class="strong">${Math.round(pTop*100)} %<span class="pbar2"><b style="width:${pTop*100}%"></b></span></td><td>${f(pTop,2)}</td><td>${f(1+pTop,2)}</td><td>${f(2-pTop,2)}</td></tr>`;
+  });
+  document.getElementById("effectTbl").innerHTML = e + "</tbody>";
 })();
 
 /* tooltip */
