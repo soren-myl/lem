@@ -159,7 +159,7 @@ tr.dk .flag { background: var(--ink); color: var(--bg); border-color: var(--ink)
 
   <section class="card">
     <h2>Forventet slutstilling</h2>
-    <p class="sub">5-årsværdi for 2022/23–2026/27. "Tillæg" er landets forventede point fra nu og til finalen i maj, inklusive bonus. Intervallet rummer de 80 % mest sandsynlige udfald.</p>
+    <p class="sub">5-årsværdi for 2022/23–2026/27. Placeringerne 10–14 er de fem landes pladser, hvis ingen andre lande overhaler dem. "Tillæg" er landets forventede point fra nu og til finalen i maj, inklusive bonus. Intervallet rummer de 80 % mest sandsynlige udfald.</p>
     <div class="scroll"><table id="finalTbl"></table></div>
     <div style="height:18px"></div>
     <div id="range"></div>
@@ -187,8 +187,8 @@ tr.dk .flag { background: var(--ink); color: var(--bg); border-color: var(--ink)
 
   <section class="twocol">
     <div class="card">
-      <h2>Rækkefølgen blandt de fem</h2>
-      <p class="sub">Sandsynlighed for at ende som nr. 1–5 på 5-årsværdien, når kun disse fem lande sammenlignes.</p>
+      <h2>Placering på ranglisten</h2>
+      <p class="sub">Sandsynlighed for at ende på plads 10–14 på 5-årsværdien. Pladserne er de fem landes nuværende placeringer, og kun disse fem lande er simuleret.</p>
       <div class="heat" id="heat"></div>
     </div>
     <div class="card">
@@ -254,7 +254,7 @@ const byFinal = [...ORDER].sort((a,b) => SUM[b].total_final - SUM[a].total_final
   const top3 = rk[0] + rk[1] + rk[2];
   const maxAdd = [...ORDER].sort((a,b) => SUM[b].exp_add - SUM[a].exp_add)[0];
   const tiles = [
-    {k:"Danmarks forventede slutværdi", v:f(d.total_final,1), d:`Fra ${f(d.total_now,1)} i dag. 80 %-interval ${f(d.total_p10,1)}–${f(d.total_p90,1)}. ${Math.round(top3*100)} % for at ende som nr. 3 eller bedre blandt de fem.`},
+    {k:"Danmarks forventede slutværdi", v:f(d.total_final,1), d:`Fra ${f(d.total_now,1)} i dag. 80 %-interval ${f(d.total_p10,1)}–${f(d.total_p90,1)}. ${Math.round(top3*100)} % for at ende som nr. 12 eller bedre.`},
     {k:"Resterende tillæg", v:"+"+f(d.exp_add), d: maxAdd === "DEN" ? `Størst af de fem (Grækenland +${f(SUM.GRE.exp_add)}, Norge +${f(SUM.NOR.exp_add)}, Tjekkiet +${f(SUM.CZE.exp_add)}, Polen +${f(SUM.POL.exp_add)}). Dansk sæsonværdi: ${f(d.season_now,3)} → ${f(d.season_final,2)}.` : ""},
     {k:"Heraf bonus for Danmark", v:"+"+f(bonusOf("DEN")), d:`${f(d.bonus)} fra ligafaseplacering og ${f(d.ko_bonus)} fra knockout-runder. Grækenland forventer ${f(bonusOf("GRE"))}, Polen kun ${f(bonusOf("POL"))}.`}
   ];
@@ -263,10 +263,10 @@ const byFinal = [...ORDER].sort((a,b) => SUM[b].total_final - SUM[a].total_final
 
 /* final table */
 (function(){
-  let h = `<thead><tr><th>#</th><th class="l">Land</th><th>Nu</th><th>Tillæg</th><th>Forventet slut</th><th>80 %-interval</th><th>Sæson 26/27 nu → slut</th></tr></thead><tbody>`;
+  let h = `<thead><tr><th>Plac.</th><th class="l">Land</th><th>Nu</th><th>Tillæg</th><th>Forventet slut</th><th>80 %-interval</th><th>Sæson 26/27 nu → slut</th></tr></thead><tbody>`;
   byFinal.forEach((c,i) => {
     const s = SUM[c];
-    h += `<tr class="${c==="DEN"?"dk":""}"><td class="dim">${i+1}</td><td class="l strong">${flag(c)}${NAME[c]}</td><td>${f(s.total_now,3)}</td><td class="pos">+${f(s.exp_add)}</td><td class="strong">${f(s.total_final)}</td><td class="dim">${f(s.total_p10,1)}–${f(s.total_p90,1)}</td><td class="dim">${f(s.season_now,3)} → ${f(s.season_final)}</td></tr>`;
+    h += `<tr class="${c==="DEN"?"dk":""}"><td class="dim">${i+10}</td><td class="l strong">${flag(c)}${NAME[c]}</td><td>${f(s.total_now,3)}</td><td class="pos">+${f(s.exp_add)}</td><td class="strong">${f(s.total_final)}</td><td class="dim">${f(s.total_p10,1)}–${f(s.total_p90,1)}</td><td class="dim">${f(s.season_now,3)} → ${f(s.season_final)}</td></tr>`;
   });
   document.getElementById("finalTbl").innerHTML = h + "</tbody>";
 })();
@@ -308,11 +308,11 @@ const byFinal = [...ORDER].sort((a,b) => SUM[b].total_final - SUM[a].total_final
 
 /* heatmap */
 (function(){
-  let h = `<div></div>` + [1,2,3,4,5].map(i => `<div class="h">Nr. ${i}</div>`).join("");
+  let h = `<div></div>` + [10,11,12,13,14].map(i => `<div class="h">Nr. ${i}</div>`).join("");
   byFinal.forEach(c => {
     h += `<div class="lab">${flag(c)}${NAME[c]}</div>`;
     DATA.rank5[c].forEach((p,i) => {
-      h += `<div class="hc ${p>0.8?"hi":""} ${p<0.005?"zero":""}" style="--p:${Math.min(p,1).toFixed(3)}" data-tip="${NAME[c]} ender som nr. ${i+1} af de fem i ${(p*100).toFixed(1).replace(".", ",")} % af simuleringerne">${pc(p)}</div>`;
+      h += `<div class="hc ${p>0.8?"hi":""} ${p<0.005?"zero":""}" style="--p:${Math.min(p,1).toFixed(3)}" data-tip="${NAME[c]} ender som nr. ${i+10} i ${(p*100).toFixed(1).replace(".", ",")} % af simuleringerne">${pc(p)}</div>`;
     });
   });
   document.getElementById("heat").innerHTML = h;
