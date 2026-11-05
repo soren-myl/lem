@@ -74,8 +74,11 @@ details[open] > summary .chev { transform: rotate(180deg); }
 
 /* tables */
 .scroll { overflow-x: auto; margin: 0 -2px; padding: 0 2px; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 8px 7px; text-align: right; border-bottom: 1px solid var(--line); }
+td { white-space: nowrap; }
+td.l { white-space: nowrap; }
+td.l.wrap { white-space: normal; }
 th { font-size: 12.5px; font-weight: 600; color: var(--ink2); vertical-align: bottom; }
 th:first-child, td:first-child, th.l, td.l { text-align: left; padding-left: 0; }
 tbody tr:last-child td { border-bottom: 0; }
@@ -126,6 +129,22 @@ tr.dk .flag { background: var(--ink); color: var(--bg); border-color: var(--ink)
 
 #tip { position: fixed; z-index: 30; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 12.5px; line-height: 1.4; padding: 6px 9px; border-radius: 5px; max-width: 280px; opacity: 0; transition: opacity .08s; }
 @media (prefers-reduced-motion: reduce) { .chev, .ttl { transition: none; } }
+
+/* narrow screens: each table row becomes a small stacked block, so nothing needs side-scrolling */
+@media (max-width: 760px) {
+  .scroll { overflow: visible; margin: 0; padding: 0; }
+  table, thead, tbody, tr, td { display: block; width: 100%; }
+  thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  tbody tr { padding: 10px 0 8px; border-bottom: 1px solid var(--line2); }
+  tbody tr:last-child { border-bottom: 0; }
+  tr.dk { background: var(--hl); border-radius: 6px; padding-inline: 8px; }
+  td { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; text-align: right; border: 0; padding: 3px 0; white-space: normal; }
+  td::before { content: attr(data-label); color: var(--ink2); font-size: 12.5px; font-weight: 400; text-align: left; flex: none; }
+  td:first-child { display: block; text-align: left; padding: 0 0 4px; font-size: 15px; }
+  td:first-child::before { content: none; }
+  tr.dk td { background: none; }
+  tr.dk td:first-child { padding-left: 0; }
+}
 
 </style>
 
@@ -322,7 +341,7 @@ document.getElementById("asof").textContent = `${META.label} · ${META.range} ·
 (function(){
   let h = `<thead><tr><th class="l">Opdatering</th>${ORDER.map(c => `<th>${flag(c)}${NAME[c]}</th>`).join("")}<th>DK foran NO</th></tr></thead><tbody>`;
   HIST.forEach((e, i) => {
-    h += `<tr class="${i === HIST.length-1 ? "dk" : ""}"><td class="l strong">${e.label}</td>${ORDER.map(c => `<td>${f(e.total_after[c],3)}</td>`).join("")}<td>${pc(e.p_den_nor)}</td></tr>`;
+    h += `<tr class="${i === HIST.length-1 ? "dk" : ""}"><td class="l strong wrap">${e.label}</td>${ORDER.map(c => `<td>${f(e.total_after[c],3)}</td>`).join("")}<td>${pc(e.p_den_nor)}</td></tr>`;
   });
   document.getElementById("histTbl").innerHTML = h + "</tbody>";
 })();
@@ -338,6 +357,12 @@ document.getElementById("asof").textContent = `${META.label} · ${META.range} ·
   });
   document.getElementById("seasonTbl").innerHTML = h + "</tbody>";
 })();
+
+/* label cells for the stacked table layout on narrow screens */
+document.querySelectorAll("table").forEach(t => {
+  const heads = [...t.querySelectorAll("thead th")].map(th => th.textContent.trim());
+  t.querySelectorAll("tbody tr").forEach(tr => [...tr.children].forEach((td, i) => td.setAttribute("data-label", heads[i] || "")));
+});
 
 /* fold controls */
 (function(){
