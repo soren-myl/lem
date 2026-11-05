@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Koefficient-resultat</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+
+:root {
+  --bg: #f9f9f7;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.10);
+  --hl: rgba(42,120,214,0.08);
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --on-s: #ffffff;
+  --on-s4: #0b0b0b;
+  --on-fill: #ffffff;
+  --good: #006300;
+  --shadow: 0 1px 0 rgba(11,11,11,0.03);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --hl: rgba(57,135,229,0.14);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --on-s4: #0b0b0b; --good: #0ca30c;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --hl: rgba(57,135,229,0.14);
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --on-s4: #0b0b0b; --good: #0ca30c;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink2); font-weight: 600; }
+h1 { font-size: clamp(24px, 4.2vw, 34px); line-height: 1.15; margin: 6px 0 10px; font-weight: 700; letter-spacing: -.01em; text-wrap: balance; }
+h2 { font-size: 18px; margin: 0 0 4px; font-weight: 650; text-wrap: balance; }
+.lede { color: var(--ink2); max-width: 68ch; margin: 0; }
+.sub { color: var(--ink2); font-size: 13.5px; margin: 0 0 14px; max-width: 72ch; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 18px 16px; box-shadow: var(--shadow); min-width: 0; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.tile .k { font-size: 12px; color: var(--ink2); letter-spacing: .04em; text-transform: uppercase; font-weight: 600; }
+.tile .v { font-size: 30px; line-height: 1.1; font-weight: 700; margin: 4px 0 4px; }
+.tile .d { font-size: 13.5px; color: var(--ink2); }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th { font-size: 12px; font-weight: 600; color: var(--ink2); letter-spacing: .02em; vertical-align: bottom; }
+th:first-child, td:first-child, th.l, td.l { text-align: left; }
+tbody tr:last-child td { border-bottom: 0; }
+tr.dk td { background: var(--hl); }
+.scroll { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
+.flag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--axis); color: var(--ink2); margin-right: 8px; min-width: 28px; text-align: center; }
+tr.dk .flag { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.pos { color: var(--good); font-weight: 600; }
+.strong { font-weight: 650; }
+.dim { color: var(--ink2); }
+.muted { color: var(--muted); }
+/* range chart */
+.range { display: grid; grid-template-columns: minmax(96px, 150px) 1fr; gap: 0 12px; align-items: center; }
+.range .lab { font-size: 14px; padding: 9px 0; display: flex; align-items: center; }
+.track { position: relative; height: 38px; }
+.track .gl { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid); }
+.track .tk { position: absolute; bottom: -2px; transform: translateX(-50%); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.axisrow { height: 22px; }
+.axisrow .track { height: 22px; }
+.axisrow .tk { top: 2px; bottom: auto; }
+.bar80 { position: absolute; top: 17px; height: 4px; border-radius: 2px; background: var(--axis); }
+.nowtick { position: absolute; top: 10px; height: 18px; width: 2px; background: var(--ink2); border-radius: 1px; }
+.dot { position: absolute; top: 13px; width: 12px; height: 12px; border-radius: 50%; transform: translateX(-50%); background: var(--surface); border: 2px solid var(--ink); }
+.dot.dk { background: var(--ink); box-shadow: 0 0 0 2px var(--surface); }
+.keyline { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; color: var(--ink2); margin-top: 12px; align-items: center; }
+.keyline i { display: inline-block; vertical-align: middle; margin-right: 6px; }
+.k-now { width: 2px; height: 14px; background: var(--ink2); }
+.k-bar { width: 22px; height: 4px; border-radius: 2px; background: var(--axis); }
+.k-dot { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--ink); background: var(--surface); }
+.k-dot.f { background: var(--ink); }
+/* stacked bars */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink2); margin-bottom: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.stack { display: grid; grid-template-columns: minmax(96px, 150px) 1fr 54px; gap: 8px 12px; align-items: center; }
+.stack .lab { font-size: 14px; display: flex; align-items: center; }
+.sbar { display: flex; gap: 2px; height: 30px; }
+.seg { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 650; font-variant-numeric: tabular-nums; overflow: hidden; min-width: 0; }
+.seg.c1 { background: var(--s1); color: var(--on-s); }
+.seg.c2 { background: var(--s2); color: var(--on-s); }
+.seg.c3 { background: var(--s3); color: var(--on-s); }
+.seg.c4 { background: var(--s4); color: var(--on-s4); }
+.stack .tot { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.sw1 { background: var(--s1); } .sw2 { background: var(--s2); } .sw3 { background: var(--s3); } .sw4 { background: var(--s4); }
+/* heatmap */
+.heat { display: grid; grid-template-columns: minmax(96px, 150px) repeat(5, minmax(44px, 1fr)); gap: 2px; align-items: stretch; }
+.heat .h { font-size: 12px; color: var(--ink2); text-align: center; padding: 2px 0 6px; font-weight: 600; }
+.heat .lab { font-size: 14px; display: flex; align-items: center; padding-right: 8px; }
+.hc { border-radius: 4px; text-align: center; padding: 8px 0; font-size: 13px; font-variant-numeric: tabular-nums; background: color-mix(in srgb, var(--s1) calc(var(--p) * 100%), var(--surface)); color: var(--ink); min-height: 34px; }
+.hc.hi { color: var(--on-fill); font-weight: 700; }
+.hc.zero { color: var(--muted); }
+/* head to head */
+.h2h { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.h2h .r { display: grid; grid-template-columns: minmax(120px, 170px) 1fr 48px; gap: 12px; align-items: center; font-size: 14px; }
+.pbar { height: 12px; border-radius: 6px; background: var(--grid); position: relative; overflow: hidden; }
+.pbar b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); border-radius: 6px 0 0 6px; }
+.pbar u { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--surface); }
+.h2h .pv { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.twocol { display: grid; grid-template-columns: 1.25fr 1fr; gap: 22px; }
+@media (max-width: 760px) { .twocol { grid-template-columns: 1fr; } }
+/* club table */
+.cg td { background: transparent; font-weight: 700; font-size: 13px; padding-top: 14px; border-bottom: 1px solid var(--axis); }
+.minibar { display: inline-block; vertical-align: middle; width: 38px; height: 6px; border-radius: 3px; background: var(--grid); margin-left: 8px; position: relative; overflow: hidden; }
+.minibar b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--s1); border-radius: 3px; }
+/* ladder */
+.ladder { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.ladder > div { border: 1px solid var(--grid); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; }
+.ladder h3 { margin: 0 0 6px; font-size: 14px; }
+.ladder p { margin: 3px 0; color: var(--ink2); }
+.ladder p b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.notes { font-size: 13.5px; color: var(--ink2); }
+.notes p { max-width: 78ch; }
+.notes p { margin: 0 0 9px; }
+.notes b { color: var(--ink); }
+/* access / effect */
+.access td.l, .access th.l { white-space: normal; }
+.access tr.in td { background: var(--hl); }
+.access tr.edge td { border-bottom: 2px solid var(--ink); }
+.access td .sm { color: var(--ink2); font-size: 12.5px; }
+.delta { margin: 14px 0 0; padding: 12px 14px; border-left: 3px solid var(--ink); background: var(--hl); border-radius: 0 8px 8px 0; font-size: 14px; max-width: 78ch; }
+.pbar2 { display: inline-block; vertical-align: middle; width: 70px; height: 8px; border-radius: 4px; background: var(--grid); position: relative; overflow: hidden; margin-left: 8px; }
+.pbar2 b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); border-radius: 4px 0 0 4px; }
+.heat .br { grid-column: span 3; text-align: center; font-size: 11.5px; line-height: 1.25; color: var(--ink2); border-bottom: 2px solid var(--ink); padding: 0 2px 5px; margin-bottom: 4px; font-weight: 600; }
+.heat .br.b2 { grid-column: span 2; border-bottom-color: var(--axis); }
+.heat .br span { display: block; font-weight: 400; font-size: 11px; }
+#tip { position: fixed; z-index: 30; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 12.5px; line-height: 1.4; padding: 7px 10px; border-radius: 6px; max-width: 280px; opacity: 0; transition: opacity .08s; font-variant-numeric: tabular-nums; }
+@media (max-width: 560px) {
+  .card { padding: 14px 12px; }
+  .range { grid-template-columns: 112px 1fr; gap: 0 8px; }
+  .stack { grid-template-columns: 112px 1fr 44px; gap: 8px; }
+  .flag { margin-right: 6px; }
+  .h2h .r { grid-template-columns: 1fr 44px; }
+  .h2h .r .pbar { grid-column: 1 / -1; order: 3; }
+}
+
+.day { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink2); font-weight: 650; margin: 18px 0 6px; padding-bottom: 5px; border-bottom: 1px solid var(--axis); }
+.day:first-child { margin-top: 4px; }
+.match { padding: 10px 0; border-bottom: 1px solid var(--grid); display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(180px, 1fr); gap: 4px 18px; align-items: center; }
+.match:last-child { border-bottom: 0; }
+.mteams { font-size: 14.5px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; min-width: 0; }
+.mteams .focus { font-weight: 650; }
+.cb { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--axis); color: var(--ink2); }
+.mbar { display: flex; gap: 2px; height: 24px; }
+.mseg { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 650; font-variant-numeric: tabular-nums; overflow: hidden; border-radius: 4px; }
+.mseg.w { background: var(--s1); color: var(--on-s); }
+.mseg.d { background: var(--axis); color: var(--ink); }
+.mseg.l { background: var(--s2); color: var(--on-s); }
+.mmeta { grid-column: 1 / -1; font-size: 12.5px; color: var(--ink2); font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) { .match { grid-template-columns: 1fr; } }
+
+.mseg.act { box-shadow: inset 0 0 0 3px var(--surface), inset 0 0 0 5px var(--ink); }
+.mteams .score { font-weight: 700; font-variant-numeric: tabular-nums; padding: 1px 8px; border-radius: 6px; background: var(--grid); color: var(--ink); }
+.surp { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 1px 7px; border-radius: 4px; background: var(--ink); color: var(--bg); }
+
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="h1"></h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <section class="tiles" id="tiles"></section>
+
+  <section class="card">
+    <h2>Ugens point: faktisk mod forventet</h2>
+    <p class="sub">Koefficientpoint: sejr 2, uafgjort 1, nederlag 0, delt med antal klubber, landet har sendt i Europa (Danmark 4, øvrige 5). Forventningen er fra prediction-siden, lavet før kampene.</p>
+    <div class="scroll"><table id="weekTbl"></table></div>
+    <div style="height:18px"></div>
+    <div id="range"></div>
+    <div class="keyline">
+      <span><i class="k-bar"></i>80 %-interval fra prediction</span>
+      <span><i class="k-dot"></i>Forventet</span>
+      <span><i class="k-dot f"></i>Faktisk</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Resultaterne</h2>
+    <p class="sub">Søjlen viser sandsynlighederne fra prediction-siden. Rammen markerer det udfald, der skete. "Overraskelse" betyder, at udfaldet havde under 25 % sandsynlighed.</p>
+    <div class="legend">
+      <span><i class="sw1"></i>Hjemmesejr</span>
+      <span><i style="background:var(--axis)"></i>Uafgjort</span>
+      <span><i class="sw2"></i>Udesejr</span>
+    </div>
+    <div id="matches"></div>
+  </section>
+
+  <section class="card">
+    <h2>Stillingen på 5-årsranglisten</h2>
+    <p class="sub">De fem landes placering på pladserne 10–14, hvis ingen andre lande overhaler dem. 5-årsværdien er kassiesa-stillingen fra 23. oktober plus ugens point, regnet ud fra resultaterne.</p>
+    <div class="scroll"><table id="rankTbl"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>Opdateret prognose for resten af sæsonen</h2>
+    <p class="sub">Forventet slutværdi for sæsonen 2026/27 efter ugens resultater, og hvordan den har flyttet sig siden prognosen før kampene. Plads 10–12 giver et ekstra Europa League-hold og ét Conference League-hold mindre end plads 13–15, og landets Champions League-hold går direkte i ligafasen.</p>
+    <div class="scroll"><table id="seasonTbl"></table></div>
+    <div style="height:18px"></div>
+    <div class="scroll"><table id="effectTbl"></table></div>
+    <p class="sub" style="margin:10px 0 0">Forventede pladser regnet pr. land ud fra sandsynligheden for plads 10–12, og at alle fem lande får 5 hold i alt.</p>
+  </section>
+
+  <section class="card notes">
+    <h2>Sådan er det regnet</h2>
+    <p><b>Resultater og point.</b> Kampresultaterne er hentet fra offentlige kilder, og ugens point er regnet ud efter reglen 2/1/0 pr. kamp og delt med landets antal klubber. Bonuspoint for ligafaseplacering og knockout-runder kommer først senere i sæsonen og indgår i prognosen, ikke i stillingen.</p>
+    <p><b>Prognosen.</b> 100.000 simulerede forløb af resten af sæsonen fra den opdaterede stilling, med Elo-ækvivalente ratings fra StatsUltra, hjemmebanefordel og tilfældig variation i klubbernes styrke. Enkelte klubber uden rating har skønnede værdier.</p>
+    <p><b>Adgangsreglerne.</b> Oversigten over pladser pr. placering er ikke verificeret mod UEFAs reglement.</p>
+  </section>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const RES = {"matches":[{"comp":"UCL","md":4,"date":"2026-11-03","home":"Bodø/Glimt","away":"Lille","ch":"NOR","ca":"FRA","pW":0.5401,"pD":0.2199,"pL":0.24,"xg_h":1.90331,"xg_a":1.19514,"top_score":[1,1],"top_score_p":0.10179,"pts_h":1.3001,"pts_a":0.6999,"rating_h":1679.0,"rating_a":1651.0,"p_over25":0.60042,"hg":0,"ag":0,"outcome":"D","p_outcome":0.2199,"act_pts_h":1,"act_pts_a":1,"surprise":true},{"comp":"UCL","md":4,"date":"2026-11-04","home":"AEK Athens","away":"Real Madrid","ch":"GRE","ca":"ESP","pW":0.23814,"pD":0.2194,"pL":0.54246,"xg_h":1.18824,"xg_a":1.91439,"top_score":[1,1],"top_score_p":0.10211,"pts_h":0.69568,"pts_a":1.30432,"rating_h":1630.0,"rating_a":1821.0,"p_over25":0.59903,"hg":2,"ag":3,"outcome":"A","p_outcome":0.54246,"act_pts_h":0,"act_pts_a":2,"surprise":false},{"comp":"UCL","md":4,"date":"2026-11-04","home":"Slavia Prague","away":"Arsenal","ch":"CZE","ca":"ENG","pW":0.15876,"pD":0.18673,"pL":0.65451,"xg_h":1.0036,"xg_a":2.26388,"top_score":[0,2],"top_score_p":0.09699,"pts_h":0.50426,"pts_a":1.49574,"rating_h":1621.0,"rating_a":1894.0,"p_over25":0.63375,"hg":1,"ag":2,"outcome":"A","p_outcome":0.65451,"act_pts_h":0,"act_pts_a":2,"surprise":false},{"comp":"UCL","md":4,"date":"2026-11-04","home":"Viking","away":"Sabah","ch":"NOR","ca":"AZE","pW":0.565,"pD":0.21447,"pL":0.22052,"xg_h":1.98311,"xg_a":1.14674,"top_score":[1,1],"top_score_p":0.09853,"pts_h":1.34448,"pts_a":0.65553,"rating_h":1585.0,"rating_a":1537.0,"p_over25":0.60667,"hg":4,"ag":1,"outcome":"H","p_outcome":0.565,"act_pts_h":2,"act_pts_a":0,"surprise":false},{"comp":"UEL","md":4,"date":"2026-11-05","home":"Sparta Prague","away":"Bournemouth","ch":"CZE","ca":"ENG","pW":0.24752,"pD":0.22283,"pL":0.52965,"xg_h":1.21058,"xg_a":1.8791,"top_score":[1,1],"top_score_p":0.10381,"pts_h":0.71786,"pts_a":1.28214,"rating_h":1568.0,"rating_a":1750.0,"p_over25":0.59699,"hg":1,"ag":3,"outcome":"A","p_outcome":0.52965,"act_pts_h":0,"act_pts_a":2,"surprise":false},{"comp":"UEL","md":4,"date":"2026-11-05","home":"Lillestrøm","away":"Viktoria Plzeň","ch":"NOR","ca":"CZE","pW":0.38833,"pD":0.23938,"pL":0.37229,"xg_h":1.52889,"xg_a":1.48862,"top_score":[1,1],"top_score_p":0.11184,"pts_h":1.01604,"pts_a":0.98396,"rating_h":1466.0,"rating_a":1540.0,"p_over25":0.57917,"hg":0,"ag":1,"outcome":"A","p_outcome":0.37229,"act_pts_h":0,"act_pts_a":2,"surprise":false},{"comp":"UEL","md":4,"date":"2026-11-05","home":"Levski Sofia","away":"Jagiellonia Białystok","ch":"BUL","ca":"POL","pW":0.3724,"pD":0.23747,"pL":0.39013,"xg_h":1.4862,"xg_a":1.53153,"top_score":[1,1],"top_score_p":0.10895,"pts_h":0.98227,"pts_a":1.01773,"rating_h":1420.0,"rating_a":1507.0,"p_over25":0.58037,"hg":1,"ag":0,"outcome":"H","p_outcome":0.3724,"act_pts_h":2,"act_pts_a":0,"surprise":false},{"comp":"UEL","md":4,"date":"2026-11-04","home":"Rennes","away":"Olympiacos","ch":"FRA","ca":"GRE","pW":0.51609,"pD":0.22464,"pL":0.25927,"xg_h":1.84607,"xg_a":1.23234,"top_score":[1,1],"top_score_p":0.10398,"pts_h":1.25683,"pts_a":0.74317,"rating_h":1669.0,"rating_a":1655.0,"p_over25":0.59398,"hg":0,"ag":0,"outcome":"D","p_outcome":0.22464,"act_pts_h":1,"act_pts_a":1,"surprise":true},{"comp":"UEL","md":4,"date":"2026-11-05","home":"Hapoel Be'er Sheva","away":"OFI","ch":"ISR","ca":"GRE","pW":0.51748,"pD":0.22389,"pL":0.25863,"xg_h":1.85066,"xg_a":1.22934,"top_score":[1,1],"top_score_p":0.10367,"pts_h":1.25886,"pts_a":0.74115,"rating_h":1470.0,"rating_a":1455.0,"p_over25":0.59427,"hg":0,"ag":2,"outcome":"A","p_outcome":0.25863,"act_pts_h":0,"act_pts_a":2,"surprise":false},{"comp":"UEL","md":4,"date":"2026-11-05","home":"Benfica","away":"Lech Poznań","ch":"POR","ca":"POL","pW":0.66861,"pD":0.18257,"pL":0.14882,"xg_h":2.31354,"xg_a":0.98191,"top_score":[2,0],"top_score_p":0.09828,"pts_h":1.51979,"pts_a":0.48021,"rating_h":1731.0,"rating_a":1607.0,"p_over25":0.64255,"hg":3,"ag":1,"outcome":"H","p_outcome":0.66861,"act_pts_h":2,"act_pts_a":0,"surprise":false},{"comp":"UECL","md":3,"date":"2026-11-05","home":"AGF","away":"Braga","ch":"DEN","ca":"POR","pW":0.34313,"pD":0.23778,"pL":0.41909,"xg_h":1.42277,"xg_a":1.59969,"top_score":[1,1],"top_score_p":0.10971,"pts_h":0.92404,"pts_a":1.07596,"rating_h":1498.0,"rating_a":1605.0,"p_over25":0.58317,"hg":0,"ag":0,"outcome":"D","p_outcome":0.23778,"act_pts_h":1,"act_pts_a":1,"surprise":true},{"comp":"UECL","md":3,"date":"2026-11-05","home":"Midtjylland","away":"Ajax","ch":"DEN","ca":"NED","pW":0.50042,"pD":0.22839,"pL":0.27119,"xg_h":1.80395,"xg_a":1.26122,"top_score":[1,1],"top_score_p":0.10445,"pts_h":1.22923,"pts_a":0.77077,"rating_h":1611.0,"rating_a":1608.0,"p_over25":0.59152,"hg":1,"ag":6,"outcome":"A","p_outcome":0.27119,"act_pts_h":0,"act_pts_a":2,"surprise":false},{"comp":"UECL","md":3,"date":"2026-11-05","home":"Monaco","away":"Nordsjælland","ch":"FRA","ca":"DEN","pW":0.67423,"pD":0.17911,"pL":0.14666,"xg_h":2.33675,"xg_a":0.97212,"top_score":[2,0],"top_score_p":0.09831,"pts_h":1.52757,"pts_a":0.47243,"rating_h":1690.0,"rating_a":1561.0,"p_over25":0.64312,"hg":2,"ag":0,"outcome":"H","p_outcome":0.67423,"act_pts_h":2,"act_pts_a":0,"surprise":false},{"comp":"UECL","md":3,"date":"2026-11-05","home":"Copenhagen","away":"Iberia 1999","ch":"DEN","ca":"GEO","pW":0.75099,"pD":0.14816,"pL":0.10084,"xg_h":2.64554,"xg_a":0.8577,"top_score":[2,0],"top_score_p":0.10435,"pts_h":1.65016,"pts_a":0.34985,"rating_h":1611.0,"rating_a":1417.0,"p_over25":0.67751,"hg":2,"ag":1,"outcome":"H","p_outcome":0.75099,"act_pts_h":2,"act_pts_a":0,"surprise":false},{"comp":"UECL","md":3,"date":"2026-11-05","home":"Sint-Truiden","away":"Brann","ch":"BEL","ca":"NOR","pW":0.50999,"pD":0.22748,"pL":0.26252,"xg_h":1.83122,"xg_a":1.24242,"top_score":[1,1],"top_score_p":0.1044,"pts_h":1.24747,"pts_a":0.75252,"rating_h":1527.0,"rating_a":1517.0,"p_over25":0.59225,"hg":1,"ag":1,"outcome":"D","p_outcome":0.22748,"act_pts_h":1,"act_pts_a":1,"surprise":true},{"comp":"UECL","md":3,"date":"2026-11-05","home":"Panathinaikos","away":"CSKA Sofia","ch":"GRE","ca":"BUL","pW":0.69652,"pD":0.17169,"pL":0.13178,"xg_h":2.42037,"xg_a":0.93821,"top_score":[2,0],"top_score_p":0.1005,"pts_h":1.56475,"pts_a":0.43526,"rating_h":1614.0,"rating_a":1467.0,"p_over25":0.65144,"hg":2,"ag":1,"outcome":"H","p_outcome":0.69652,"act_pts_h":2,"act_pts_a":0,"surprise":false},{"comp":"UECL","md":3,"date":"2026-11-05","home":"Riga","away":"Jablonec","ch":"LVA","ca":"CZE","pW":0.39793,"pD":0.23921,"pL":0.36286,"xg_h":1.552,"xg_a":1.46655,"top_score":[1,1],"top_score_p":0.11131,"pts_h":1.03507,"pts_a":0.96493,"rating_h":1445.0,"rating_a":1512.0,"p_over25":0.58052,"hg":1,"ag":1,"outcome":"D","p_outcome":0.23921,"act_pts_h":1,"act_pts_a":1,"surprise":true}],"countries":{"DEN":{"matches":4,"n_clubs":4,"exp_gain":1.06896,"act_gain":0.75,"gain_p10":0.5,"gain_p90":1.5,"club_pts_act":3.0,"club_pts_exp":4.27585,"club_pts_max":8,"season_before":5.75,"total_before":40.056,"season_after":6.5,"total_after":40.806,"pred_total_after":41.12496},"NOR":{"matches":4,"n_clubs":5,"exp_gain":0.88263,"act_gain":0.8,"gain_p10":0.4,"gain_p90":1.4,"club_pts_act":4.0,"club_pts_exp":4.41313,"club_pts_max":8,"season_before":6.6,"total_before":40.212,"season_after":7.4,"total_after":41.012,"pred_total_after":41.09463},"POL":{"matches":2,"n_clubs":5,"exp_gain":0.29959,"act_gain":0.0,"gain_p10":0.0,"gain_p90":0.6,"club_pts_act":0.0,"club_pts_exp":1.49794,"club_pts_max":4,"season_before":3.6,"total_before":45.725,"season_after":3.6,"total_after":45.725,"pred_total_after":46.02459},"CZE":{"matches":4,"n_clubs":5,"exp_gain":0.6342,"act_gain":0.6,"gain_p10":0.2,"gain_p90":1.0,"club_pts_act":3.0,"club_pts_exp":3.17102,"club_pts_max":8,"season_before":3.9,"total_before":45.725,"season_after":4.5,"total_after":46.325,"pred_total_after":46.3592},"GRE":{"matches":4,"n_clubs":5,"exp_gain":0.74895,"act_gain":1.0,"gain_p10":0.4,"gain_p90":1.2,"club_pts_act":5.0,"club_pts_exp":3.74473,"club_pts_max":8,"season_before":6.2,"total_before":46.612,"season_after":7.2,"total_after":47.612,"pred_total_after":47.36095}},"order_after":["GRE","CZE","POL","NOR","DEN"],"order_before":["GRE","POL","CZE","NOR","DEN"],"n_results":17,"n_expected":17};
+const SEASON = {"summary":{"DEN":{"season_now":6.5,"total_now":40.806,"exp_add":6.61869,"add_p10":4.0,"add_p90":9.46875,"season_final":13.11869,"total_final":47.42469,"total_p10":44.806,"total_p90":50.27475,"n":4,"coef_league":3.23782,"bonus":0.8667,"ko_pts":2.17704,"ko_bonus":0.33713},"NOR":{"season_now":7.4,"total_now":41.012,"exp_add":4.15984,"add_p10":2.4,"add_p90":6.15,"season_final":11.55984,"total_final":45.17184,"total_p10":43.412,"total_p90":47.162,"n":5,"coef_league":2.38026,"bonus":0.66468,"ko_pts":0.8974,"ko_bonus":0.2175},"POL":{"season_now":3.6,"total_now":45.725,"exp_add":1.79674,"add_p10":0.8,"add_p90":3.2,"season_final":5.39674,"total_final":47.52174,"total_p10":46.525,"total_p90":48.925,"n":5,"coef_league":1.42865,"bonus":0.10006,"ko_pts":0.21933,"ko_bonus":0.0487},"CZE":{"season_now":4.5,"total_now":46.325,"exp_add":3.35306,"add_p10":1.725,"add_p90":5.25,"season_final":7.85306,"total_final":49.67806,"total_p10":48.05,"total_p90":51.575,"n":5,"coef_league":2.38678,"bonus":0.2844,"ko_pts":0.5793,"ko_bonus":0.10258},"GRE":{"season_now":7.2,"total_now":47.612,"exp_add":6.38983,"add_p10":4.325,"add_p90":8.6,"season_final":13.58983,"total_final":54.00183,"total_p10":51.937,"total_p90":56.212,"n":5,"coef_league":2.48356,"bonus":1.57413,"ko_pts":1.79511,"ko_bonus":0.53702}},"rank5":{"DEN":[0.01154,0.16643,0.28665,0.35127,0.18411],"NOR":[8e-05,0.00904,0.05285,0.17104,0.76699],"POL":[0.00086,0.07513,0.43627,0.44042,0.04732],"CZE":[0.02514,0.713,0.22305,0.03723,0.00158],"GRE":[0.96238,0.0364,0.00118,4e-05,0.0]}};
+const PREV = {"summary":{"DEN":{"season_now":5.75,"total_now":40.056,"exp_add":8.24993,"add_p10":5.28125,"add_p90":11.375,"season_final":13.99993,"total_final":48.30593,"total_p10":45.33725,"total_p90":51.431,"n":4,"coef_league":4.31247,"bonus":1.02392,"ko_pts":2.52541,"ko_bonus":0.38813},"NOR":{"season_now":6.6,"total_now":40.212,"exp_add":5.12208,"add_p10":3.15,"add_p90":7.275,"season_final":11.72208,"total_final":45.33408,"total_p10":43.362,"total_p90":47.487,"n":5,"coef_league":3.26737,"bonus":0.71472,"ko_pts":0.90475,"ko_bonus":0.23524},"POL":{"season_now":3.6,"total_now":45.725,"exp_add":2.37385,"add_p10":1.0,"add_p90":4.05,"season_final":5.97385,"total_final":48.09885,"total_p10":46.725,"total_p90":49.775,"n":5,"coef_league":1.72855,"bonus":0.20773,"ko_pts":0.35815,"ko_bonus":0.07942},"CZE":{"season_now":3.9,"total_now":45.725,"exp_add":4.1948,"add_p10":2.375,"add_p90":6.275,"season_final":8.0948,"total_final":49.9198,"total_p10":48.1,"total_p90":52.0,"n":5,"coef_league":3.02278,"bonus":0.38076,"ko_pts":0.66483,"ko_bonus":0.12642},"GRE":{"season_now":6.2,"total_now":46.612,"exp_add":6.94833,"add_p10":4.725,"add_p90":9.3,"season_final":13.14833,"total_final":53.56033,"total_p10":51.337,"total_p90":55.912,"n":5,"coef_league":3.22544,"bonus":1.453,"ko_pts":1.7573,"ko_bonus":0.5126}},"rank5":{"DEN":[0.04133,0.21751,0.27878,0.3216,0.14078],"NOR":[0.00035,0.01084,0.04103,0.14467,0.80311],"POL":[0.00534,0.11595,0.3796,0.44832,0.05079],"CZE":[0.05576,0.56539,0.28902,0.08453,0.0053],"GRE":[0.89722,0.09031,0.01157,0.00088,2e-05]}};
+const META = {"page_title":"Koefficient-resultat","label":"Runde 4 (Conference League: runde 3)","range":"3.–5. november 2026","title":"Sådan gik ugens kampe for Danmark, Norge, Polen, Tjekkiet og Grækenland","lede":"Danmark tog 3 klubpoint i ugens fire kampe mod ca. 4,3 forventet (0,75 landepoint mod 1,07), og Midtjylland tabte 1–6 hjemme til Ajax. Polen fik 0 point fra to kampe, mens Grækenland fik 5 klubpoint mod ca. 3,7 forventet."};
+const ORDER = ["DEN","NOR","POL","CZE","GRE"];
+const NAME = {DEN:"Danmark", NOR:"Norge", POL:"Polen", CZE:"Tjekkiet", GRE:"Grækenland"};
+const CODE = {DEN:"DK", NOR:"NO", POL:"PL", CZE:"CZ", GRE:"GR"};
+const CLUB = {"Copenhagen":"FC København","Midtjylland":"FC Midtjylland","Nordsjælland":"FC Nordsjælland","Sparta Prague":"Sparta Prag","Slavia Prague":"Slavia Prag","AEK Athens":"AEK Athen","Jagiellonia Białystok":"Jagiellonia"};
+const f = (x, d=2) => x.toFixed(d).replace(".", ",");
+const fs = (x, d=2) => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(d).replace(".", ",");
+const pc = x => Math.round(x*100) + " %";
+const cn = n => CLUB[n] || n;
+const flag = c => `<span class="flag">${CODE[c]}</span>`;
+const C = RES.countries;
+const byAfter = RES.order_after;
+const DAYS = ["søndag","mandag","tirsdag","onsdag","torsdag","fredag","lørdag"];
+const MONTHS = ["januar","februar","marts","april","maj","juni","juli","august","september","oktober","november","december"];
+const dstr = s => { const d = new Date(s + "T12:00:00Z"); return `${DAYS[d.getUTCDay()]} ${d.getUTCDate()}. ${MONTHS[d.getUTCMonth()]}`; };
+const SLOT0 = 10;
+
+document.getElementById("eyebrow").textContent = `Resultat · ${META.label} · ${META.range}`;
+document.getElementById("h1").textContent = META.title;
+document.getElementById("lede").textContent = META.lede;
+
+/* rank with ties */
+const rankOf = {};
+(function(){
+  byAfter.forEach((c,i) => {
+    const t = Math.round(C[c].total_after*1000);
+    const first = byAfter.findIndex(x => Math.round(C[x].total_after*1000) === t);
+    rankOf[c] = {n: SLOT0 + first, tie: byAfter.filter(x => Math.round(C[x].total_after*1000) === t).length > 1};
+  });
+})();
+
+/* tiles */
+(function(){
+  const dk = C.DEN, nor = C.NOR;
+  const diff = dk.act_gain - dk.exp_gain;
+  const gap = nor.total_after - dk.total_after;
+  const tiles = [
+    {k:"Danmarks ugepoint", v:"+"+f(dk.act_gain), d:`${f(dk.club_pts_act,0)} af ${dk.club_pts_max} mulige klubpoint i ${dk.matches} kampe. Forventet var +${f(dk.exp_gain)}, så ${diff >= 0 ? "over" : "under"} forventning med ${f(Math.abs(diff))}.`},
+    {k:"Danmarks placering blandt de fem", v:`nr. ${rankOf.DEN.n}${rankOf.DEN.tie ? " (delt)" : ""}`, d:`5-årsværdi ${f(dk.total_after,3)}. ${gap > 0 ? `Norge ligger ${f(gap,3)} foran.` : gap < 0 ? `Danmark ligger ${f(-gap,3)} foran Norge.` : "Danmark og Norge er lige."}`},
+    {k:"Sandsynlighed for plads 10–12", v:pc(SEASON.rank5.DEN[0]+SEASON.rank5.DEN[1]+SEASON.rank5.DEN[2]), d:`Før kampene var den ${pc(PREV.rank5.DEN[0]+PREV.rank5.DEN[1]+PREV.rank5.DEN[2])}. Forventet slutværdi er nu ${f(SEASON.summary.DEN.total_final,1)}.`}
+  ];
+  document.getElementById("tiles").innerHTML = tiles.map(t => `<div class="tile"><div class="k">${t.k}</div><div class="v">${t.v}</div><div class="d">${t.d}</div></div>`).join("");
+})();
+
+/* week table */
+(function(){
+  let h = `<thead><tr><th class="l">Land</th><th>Kampe</th><th>Klubpoint</th><th>Landepoint</th><th>Forventet</th><th>Forskel</th></tr></thead><tbody>`;
+  [...ORDER].sort((a,b) => C[b].act_gain - C[a].act_gain).forEach(c => {
+    const s = C[c], d = s.act_gain - s.exp_gain;
+    h += `<tr class="${c==="DEN"?"dk":""}"><td class="l strong">${flag(c)}${NAME[c]}</td><td>${s.matches}</td><td>${f(s.club_pts_act,0)} af ${s.club_pts_max}</td><td class="strong">+${f(s.act_gain)}</td><td class="dim">+${f(s.exp_gain)}</td><td class="${d>=0?"pos":""}">${fs(d)}</td></tr>`;
+  });
+  document.getElementById("weekTbl").innerHTML = h + "</tbody>";
+})();
+
+/* range chart */
+(function(){
+  const lo = 0, hi = 2, span = hi - lo;
+  const X = v => ((Math.min(Math.max(v, lo), hi) - lo) / span * 100) + "%";
+  const ticks = [0,0.5,1,1.5,2];
+  let h = `<div class="range"><div></div><div class="track axisrow" style="height:22px">${ticks.map(t=>`<span class="tk" style="left:${X(t)}">${f(t,1)}</span>`).join("")}</div>`;
+  [...ORDER].sort((a,b) => C[b].act_gain - C[a].act_gain).forEach(c => {
+    const s = C[c];
+    const tip = `${NAME[c]}: faktisk +${f(s.act_gain)}, forventet +${f(s.exp_gain)}, 80 %-interval ${f(s.gain_p10)}–${f(s.gain_p90)}`;
+    h += `<div class="lab">${flag(c)}${NAME[c]}</div><div class="track" data-tip="${tip}">${ticks.map(t=>`<span class="gl" style="left:${X(t)}"></span>`).join("")}<span class="bar80" style="left:${X(s.gain_p10)};width:calc(${X(s.gain_p90)} - ${X(s.gain_p10)})"></span><span class="dot" style="left:${X(s.exp_gain)}"></span><span class="dot dk" style="left:${X(s.act_gain)};top:11px;width:16px;height:16px;border-radius:3px;transform:translateX(-50%) rotate(45deg) scale(.72)"></span></div>`;
+  });
+  document.getElementById("range").innerHTML = h + "</div>";
+})();
+
+/* matches */
+(function(){
+  const byDate = {};
+  RES.matches.forEach(m => (byDate[m.date] = byDate[m.date] || []).push(m));
+  const compOrder = {UCL:0, UEL:1, UECL:2};
+  let h = "";
+  Object.keys(byDate).sort().forEach(d => {
+    h += `<div class="day">${dstr(d)}</div>`;
+    byDate[d].sort((a,b) => compOrder[a.comp] - compOrder[b.comp]).forEach(m => {
+      const seg = (p, cls, nm, key) => `<div class="mseg ${cls} ${m.outcome === key ? "act" : ""}" style="width:${p*100}%" data-tip="${nm}: ${f(p*100,0)} %">${p >= 0.13 ? Math.round(p*100) : ""}</div>`;
+      const pts = [];
+      if (ORDER.includes(m.ch)) pts.push(`${cn(m.home)} ${m.act_pts_h} point (forventet ${f(m.pts_h,2)})`);
+      if (ORDER.includes(m.ca)) pts.push(`${cn(m.away)} ${m.act_pts_a} point (forventet ${f(m.pts_a,2)})`);
+      h += `<div class="match">
+        <div class="mteams"><span class="cb">${m.comp}</span>
+          <span class="${ORDER.includes(m.ch)?"focus":""}">${ORDER.includes(m.ch)?flag(m.ch):""}${cn(m.home)}</span>
+          <span class="score">${m.hg}–${m.ag}</span>
+          <span class="${ORDER.includes(m.ca)?"focus":""}">${ORDER.includes(m.ca)?flag(m.ca):""}${cn(m.away)}</span>
+          ${m.surprise ? '<span class="surp">Overraskelse</span>' : ""}</div>
+        <div class="mbar">${seg(m.pW,"w","Hjemmesejr","H")}${seg(m.pD,"d","Uafgjort","D")}${seg(m.pL,"l","Udesejr","A")}</div>
+        <div class="mmeta">Forventede mål ${f(m.xg_h,1)}–${f(m.xg_a,1)} · ${pts.join(" · ")}</div>
+      </div>`;
+    });
+  });
+  document.getElementById("matches").innerHTML = h;
+})();
+
+/* rank table */
+(function(){
+  let h = `<thead><tr><th>Plac.</th><th class="l">Land</th><th>5-årsværdi før</th><th>Ugens point</th><th>5-årsværdi nu</th><th>Afstand til næste</th><th>Sæson 26/27</th></tr></thead><tbody>`;
+  byAfter.forEach((c,i) => {
+    const s = C[c];
+    const next = byAfter[i+1];
+    const gap = next ? s.total_after - C[next].total_after : null;
+    h += `<tr class="${c==="DEN"?"dk":""}"><td class="dim">${rankOf[c].n}${rankOf[c].tie ? " (delt)" : ""}</td><td class="l strong">${flag(c)}${NAME[c]}</td><td>${f(s.total_before,3)}</td><td class="pos">+${f(s.act_gain)}</td><td class="strong">${f(s.total_after,3)}</td><td class="dim">${gap === null ? "–" : f(gap,3) + " til " + NAME[next]}</td><td class="dim">${f(s.season_after,3)}</td></tr>`;
+  });
+  document.getElementById("rankTbl").innerHTML = h + "</tbody>";
+})();
+
+/* season outlook + effect */
+(function(){
+  const S = SEASON.summary, R = SEASON.rank5, P = PREV.summary;
+  let h = `<thead><tr><th class="l">Land</th><th>5-årsværdi nu</th><th>Forventet slutværdi</th><th>Ændring siden prediction</th><th>80 %-interval</th><th>Plads 10–12</th></tr></thead><tbody>`;
+  [...ORDER].sort((a,b) => S[b].total_final - S[a].total_final).forEach(c => {
+    const s = S[c], p = R[c][0] + R[c][1] + R[c][2];
+    const d = s.total_final - P[c].total_final;
+    h += `<tr class="${c==="DEN"?"dk":""}"><td class="l strong">${flag(c)}${NAME[c]}</td><td>${f(C[c].total_after,3)}</td><td class="strong">${f(s.total_final)}</td><td class="${d>=0?"pos":""}">${fs(d)}</td><td class="dim">${f(s.total_p10,1)}–${f(s.total_p90,1)}</td><td>${pc(p)}</td></tr>`;
+  });
+  document.getElementById("seasonTbl").innerHTML = h + "</tbody>";
+
+  let e = `<thead><tr><th class="l">Land</th><th>Gns. plads</th><th>Plads 10–12</th><th>UCL direkte</th><th>Europa L.</th><th>Conference L.</th></tr></thead><tbody>`;
+  [...ORDER].sort((a,b) => S[b].total_final - S[a].total_final).forEach(c => {
+    const r = R[c];
+    const pTop = r[0] + r[1] + r[2];
+    const mean = r.reduce((a,p,i) => a + p*(SLOT0+i), 0);
+    e += `<tr class="${c==="DEN"?"dk":""}"><td class="l strong">${flag(c)}${NAME[c]}</td><td>${f(mean,1)}</td><td class="strong">${Math.round(pTop*100)} %<span class="pbar2"><b style="width:${pTop*100}%"></b></span></td><td>${f(pTop,2)}</td><td>${f(1+pTop,2)}</td><td>${f(2-pTop,2)}</td></tr>`;
+  });
+  document.getElementById("effectTbl").innerHTML = e + "</tbody>";
+})();
+
+/* tooltip */
+(function(){
+  const tip = document.getElementById("tip");
+  const show = (el, x, y) => {
+    tip.textContent = el.getAttribute("data-tip");
+    tip.style.opacity = 1;
+    const w = tip.offsetWidth, hgt = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(x + 14, window.innerWidth - w - 8)) + "px";
+    tip.style.top = Math.max(8, Math.min(y + 14, window.innerHeight - hgt - 8)) + "px";
+  };
+  const h = e => { const el = e.target.closest && e.target.closest("[data-tip]"); if (el) show(el, e.clientX, e.clientY); else tip.style.opacity = 0; };
+  document.addEventListener("mousemove", h);
+  document.addEventListener("click", h);
+  document.addEventListener("scroll", () => { tip.style.opacity = 0; }, true);
+})();
+</script>
+
+</body>
+</html>
